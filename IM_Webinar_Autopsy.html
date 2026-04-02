@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investment Mastery — Webinar Autopsy</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --dark:#262F3A;--mid:#8A8E91;--light:#F4F4F4;--white:#FFFFFF;
+  --accent:#FF9933;--green:#239646;--red:#FE0032;--blue:#02aafb;
+  --navy:#062B4F;--border:#E4E4E4;--muted:#949494;
+}
+body{font-family:'Montserrat',sans-serif;background:#F4F4F4;color:var(--dark);min-height:100vh}
+header{background:var(--dark);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:72px;border-bottom:3px solid var(--accent)}
+.logo-text{color:white;font-family:'Oswald',sans-serif;font-size:20px;letter-spacing:3px;font-weight:500}
+.logo-sub{color:var(--accent);font-size:10px;letter-spacing:4px;display:block;font-weight:400;margin-top:1px}
+.badge{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mid);padding:4px 12px;border:1px solid rgba(138,142,145,0.3);border-radius:2px}
+main{max-width:1200px;margin:0 auto;padding:40px 24px}
+.upload-card{background:var(--white);border:2px dashed var(--border);border-radius:4px;padding:60px 40px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s}
+.upload-card:hover{border-color:var(--accent);background:#FAFAFA}
+.upload-icon{width:56px;height:56px;margin:0 auto 20px;background:var(--dark);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.upload-icon svg{width:24px;height:24px;fill:none;stroke:white;stroke-width:2}
+.upload-title{font-family:'Oswald',sans-serif;font-size:20px;font-weight:500;letter-spacing:1px;color:var(--dark);margin-bottom:8px;text-transform:uppercase}
+.upload-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.upload-steps{display:flex;justify-content:center;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mid)}
+.step-num{width:20px;height:20px;background:var(--dark);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.btn-primary{background:var(--dark);color:white;border:none;padding:12px 32px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background 0.2s;margin:6px}
+.btn-primary:hover{background:var(--navy)}
+.btn-ghost{background:transparent;color:var(--dark);border:1px solid var(--dark);padding:12px 32px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;margin:6px}
+.btn-ghost:hover{background:var(--dark);color:white}
+#dashboard{display:none}
+.section-label{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--mid);margin-bottom:16px}
+.info-bar{background:var(--dark);color:white;padding:16px 24px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.info-bar-title{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+.info-bar-meta{font-size:12px;color:var(--mid);margin-top:2px}
+.webinar-badge{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:2px;border:1px solid var(--accent);color:var(--accent)}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:28px}
+.metric-card{background:var(--white);border-radius:4px;padding:20px 20px 16px;border-left:3px solid transparent}
+.metric-card.good{border-left-color:var(--green)}
+.metric-card.warn{border-left-color:var(--accent)}
+.metric-card.bad{border-left-color:var(--red)}
+.metric-card.neutral{border-left-color:var(--dark)}
+.metric-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600}
+.metric-value{font-family:'Oswald',sans-serif;font-size:32px;font-weight:600;color:var(--dark);line-height:1;margin-bottom:4px}
+.metric-sub{font-size:11px;color:var(--muted)}
+.metric-bench{font-size:10px;margin-top:6px;padding:3px 8px;border-radius:2px;display:inline-block;font-weight:600;letter-spacing:0.5px}
+.bg{background:#eaf3de;color:#239646}
+.bw{background:#fff4e6;color:#cc7700}
+.bb{background:#fff0f0;color:#cc0000}
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.charts-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+.chart-card{background:var(--white);border-radius:4px;padding:20px}
+.chart-title{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);margin-bottom:4px}
+.chart-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.legend span{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mid)}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px}
+.insight-card{background:var(--white);border-radius:4px;padding:20px;border-top:3px solid var(--dark)}
+.insight-card.positive{border-top-color:var(--green)}
+.insight-card.warning{border-top-color:var(--accent)}
+.insight-card.negative{border-top-color:var(--red)}
+.insight-icon{font-size:18px;margin-bottom:10px}
+.insight-title{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);margin-bottom:6px}
+.insight-text{font-size:12px;color:var(--mid);line-height:1.6}
+.reset-btn{background:transparent;color:var(--mid);border:1px solid rgba(138,142,145,0.3);padding:8px 20px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;margin-top:16px;display:inline-block}
+.reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+footer{background:var(--dark);color:var(--mid);text-align:center;padding:20px;font-size:11px;letter-spacing:1px;margin-top:40px}
+.step strong{color:var(--dark);font-weight:600}
+@media(max-width:768px){
+  header{padding:0 20px}main{padding:24px 16px}
+  .metrics-grid{grid-template-columns:1fr 1fr}
+  .charts-row,.charts-row-2{grid-template-columns:1fr}
+  .insights-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span class="logo-text">INVESTMENT MASTERY</span>
+    <span class="logo-sub">YOUR FINANCIAL FUTURE, BUILT TODAY</span>
+  </div>
+  <span class="badge">Webinar Autopsy</span>
+</header>
+
+<main>
+  <div id="upload-section">
+    <div class="upload-card" onclick="document.getElementById('csvInput').click()">
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      </div>
+      <div class="upload-title">Webinar Autopsy</div>
+      <p class="upload-sub" style="max-width:600px;margin:0 auto 28px">Every webinar leaves a data trail. This tool reads it. Upload your Zoom attendance report and get instant intelligence on drop-off points, retention, and what to fix before your next event.</p>
+      <div class="upload-steps" style="flex-direction:column;align-items:flex-start;display:inline-flex;text-align:left;margin-bottom:28px">
+        <div class="step"><div class="step-num">1</div>Log in to Zoom</div>
+        <div class="step"><div class="step-num">2</div>Click <strong>Reports</strong> in the left side panel</div>
+        <div class="step"><div class="step-num">3</div>Click <strong>Meeting and webinar history</strong></div>
+        <div class="step"><div class="step-num">4</div>Select your date range to find your webinar</div>
+        <div class="step"><div class="step-num">5</div>Click on the webinar you want to analyse</div>
+        <div class="step"><div class="step-num">6</div>Click the blue number in the <strong>Participants</strong> column</div>
+        <div class="step"><div class="step-num">7</div>Click <strong>Export</strong> (top right)</div>
+        <div class="step"><div class="step-num">8</div>Upload the CSV below</div>
+      </div>
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="event.stopPropagation();document.getElementById('csvInput').click()">Upload CSV</button>
+        <button class="btn-ghost" onclick="event.stopPropagation();loadSample()">Load sample data</button>
+      </div>
+      <input type="file" id="csvInput" accept=".csv" style="display:none" onchange="handleFile(event)">
+    </div>
+  </div>
+
+  <div id="dashboard">
+    <div class="info-bar">
+      <div>
+        <div class="info-bar-title" id="webinarName">Webinar Report</div>
+        <div class="info-bar-meta" id="webinarMeta"></div>
+      </div>
+      <span class="webinar-badge">Investment Mastery</span>
+    </div>
+
+    <p class="section-label">Performance summary</p>
+    <div class="metrics-grid" id="metricCards"></div>
+
+    <p class="section-label">Attendance &amp; drop-off analysis</p>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Attendee retention over time</div>
+        <div class="chart-sub">How many people were still watching at each point — spikes in red show when people left</div>
+        <div class="legend">
+          <span><span class="leg-dot" style="background:#262F3A"></span>Attendees present</span>
+          <span><span class="leg-dot" style="background:#FE0032"></span>Drop-off events</span>
+        </div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="dropoffChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">When people joined</div>
+        <div class="chart-sub">Late joiners signal a reminder or promotion problem</div>
+        <div style="position:relative;width:100%;height:260px"><canvas id="joinChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="charts-row-2">
+      <div class="chart-card">
+        <div class="chart-title">Time in session</div>
+        <div class="chart-sub">How long each attendee stayed — red = left early, green = stayed to the close</div>
+        <div style="position:relative;width:100%;height:200px"><canvas id="durationChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Registration to completion funnel</div>
+        <div class="chart-sub">Where you lost people — from sign-up through to the close</div>
+        <div style="position:relative;width:100%;height:200px"><canvas id="funnelChart"></canvas></div>
+      </div>
+    </div>
+
+    <p class="section-label">Conversion intelligence</p>
+    <div class="insights-grid" id="insightsGrid"></div>
+
+    <div style="text-align:center">
+      <button class="reset-btn" onclick="resetDashboard()">Upload a different report</button>
+    </div>
+  </div>
+</main>
+
+<footer>INVESTMENT MASTERY &nbsp;&middot;&nbsp; Webinar Autopsy &nbsp;&middot;&nbsp; Internal use only</footer>
+
+<script>
+let charts = {};
+
+function destroyCharts() {
+  Object.values(charts).forEach(c => { if(c) c.destroy(); });
+  charts = {};
+}
+
+function resetDashboard() {
+  destroyCharts();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('upload-section').style.display = 'block';
+  document.getElementById('csvInput').value = '';
+}
+
+function generateSample() {
+  const total = 60, attendees = [];
+  for (let i = 0; i < 118; i++) {
+    const join = Math.random() < 0.65 ? Math.floor(Math.random()*3) : Math.floor(Math.random()*18);
+    let leave;
+    const r = Math.random();
+    if (r < 0.38) leave = total;
+    else if (r < 0.52) leave = 7 + Math.floor(Math.random()*6);
+    else if (r < 0.66) leave = 28 + Math.floor(Math.random()*6);
+    else if (r < 0.80) leave = 43 + Math.floor(Math.random()*8);
+    else leave = join + 1 + Math.floor(Math.random()*4);
+    const lv = Math.min(leave, total);
+    attendees.push({ join, leave: lv, duration: lv - join });
+  }
+  return { attendees, total, registrants: 210 };
+}
+
+function loadSample() {
+  const { attendees, total, registrants } = generateSample();
+  renderDashboard(attendees, total, registrants, 'Sample Webinar — Cashflow Edition', 'Sample data · 60 min session');
+}
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const lines = ev.target.result.split('\n').filter(l => l.trim());
+    const attendees = [];
+    const parseMin = s => {
+      if (!s) return null;
+      const p = s.trim().replace(/"/g,'').split(':');
+      if (p.length >= 2) return parseInt(p[0])*60 + parseInt(p[1]);
+      return parseInt(s) || null;
+    };
+    for (let i = 1; i < lines.length; i++) {
+      const c = lines[i].split(',');
+      if (c.length < 4) continue;
+      const join = parseMin(c[2]), leave = parseMin(c[3]);
+      if (join !== null && leave !== null && leave >= join)
+        attendees.push({ join, leave, duration: leave - join });
+    }
+    if (!attendees.length) { alert('Could not read data. Check your CSV format.'); return; }
+    const total = Math.max(...attendees.map(a => a.leave));
+    renderDashboard(attendees, total, Math.round(attendees.length/0.55), file.name.replace('.csv',''), 'Zoom attendee report');
+  };
+  reader.readAsText(file);
+}
+
+function renderDashboard(attendees, total, registrants, name, meta) {
+  destroyCharts();
+  document.getElementById('upload-section').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('webinarName').textContent = name;
+  document.getElementById('webinarMeta').textContent = meta + ' · ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const n = attendees.length;
+  const showUp = Math.round((n/registrants)*100);
+  const avgDur = Math.round(attendees.reduce((s,a)=>s+a.duration,0)/n);
+  const completed = attendees.filter(a=>a.duration>=total*0.8).length;
+  const compRate = Math.round((completed/n)*100);
+  const earlyLeave = attendees.filter(a=>a.duration<10).length;
+  const earlyPct = Math.round((earlyLeave/n)*100);
+
+  const showCls = showUp>=45?'good':showUp>=35?'warn':'bad';
+  const compCls = compRate>=50?'good':compRate>=35?'warn':'bad';
+  const benchCls = c => c==='good'?'bg':c==='warn'?'bw':'bb';
+
+  document.getElementById('metricCards').innerHTML = `
+    <div class="metric-card neutral">
+      <div class="metric-label">Registrants</div>
+      <div class="metric-value">${registrants}</div>
+      <div class="metric-sub">signed up</div>
+    </div>
+    <div class="metric-card ${showCls}">
+      <div class="metric-label">Showed up</div>
+      <div class="metric-value">${n}</div>
+      <div class="metric-sub">${showUp}% show-up rate</div>
+      <span class="metric-bench ${benchCls(showCls)}">${showUp>=45?'Above avg':'Below avg'} (industry: 40-55%)</span>
+    </div>
+    <div class="metric-card neutral">
+      <div class="metric-label">Avg time in session</div>
+      <div class="metric-value">${avgDur}<span style="font-size:16px;font-weight:400"> min</span></div>
+      <div class="metric-sub">of ${total} min total</div>
+    </div>
+    <div class="metric-card ${compCls}">
+      <div class="metric-label">Completion rate</div>
+      <div class="metric-value">${compRate}<span style="font-size:16px;font-weight:400">%</span></div>
+      <div class="metric-sub">stayed 80%+ of session</div>
+      <span class="metric-bench ${benchCls(compCls)}">${compRate>=50?'Strong retention':compRate>=35?'Average retention':'High drop-off'}</span>
+    </div>`;
+
+  // Drop-off curve
+  const intervals = [];
+  for (let t=0; t<=total; t+=2)
+    intervals.push({ t, present: attendees.filter(a=>a.join<=t&&a.leave>=t).length });
+  const dropoffs = intervals.map((d,i)=>i===0?0:Math.max(0,intervals[i-1].present-d.present));
+
+  charts.dropoff = new Chart(document.getElementById('dropoffChart'),{
+    type:'bar',
+    data:{
+      labels:intervals.map(d=>d.t+'m'),
+      datasets:[
+        {type:'line',data:intervals.map(d=>d.present),borderColor:'#262F3A',backgroundColor:'rgba(38,47,58,0.07)',tension:0.4,pointRadius:0,fill:true,yAxisID:'y',order:1},
+        {type:'bar',data:dropoffs,backgroundColor:'rgba(254,0,50,0.55)',yAxisID:'y2',order:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+      x:{ticks:{font:{size:10},color:'#949494',autoSkip:true,maxTicksLimit:12},grid:{display:false}},
+      y:{position:'left',ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},
+      y2:{position:'right',ticks:{font:{size:10},color:'#FE0032'},grid:{display:false}}
+    }}
+  });
+
+  // Join time
+  const jb=[{l:'On time (0-2m)',mn:0,mx:2},{l:'3-5 min late',mn:3,mx:5},{l:'6-10 min late',mn:6,mx:10},{l:'11-20 min late',mn:11,mx:20},{l:'20+ min late',mn:21,mx:9999}];
+  charts.join = new Chart(document.getElementById('joinChart'),{
+    type:'bar',
+    data:{labels:jb.map(b=>b.l),datasets:[{data:jb.map(b=>attendees.filter(a=>a.join>=b.mn&&a.join<=b.mx).length),backgroundColor:'#262F3A',borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{
+      x:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},
+      y:{ticks:{font:{size:10},color:'#949494'},grid:{display:false}}
+    }}
+  });
+
+  // Duration
+  const db=[{l:'0-10 min',mn:0,mx:10},{l:'11-20 min',mn:11,mx:20},{l:'21-35 min',mn:21,mx:35},{l:'36-50 min',mn:36,mx:50},{l:'50+ min',mn:51,mx:9999}];
+  charts.dur = new Chart(document.getElementById('durationChart'),{
+    type:'bar',
+    data:{labels:db.map(b=>b.l),datasets:[{data:db.map(b=>attendees.filter(a=>a.duration>=b.mn&&a.duration<=b.mx).length),backgroundColor:['#FE0032','#FF9933','#FF9933','#239646','#239646'],borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{
+      x:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},
+      y:{ticks:{font:{size:10},color:'#949494'},grid:{display:false}}
+    }}
+  });
+
+  // Funnel
+  const half = attendees.filter(a=>a.duration>=total*0.5).length;
+  charts.funnel = new Chart(document.getElementById('funnelChart'),{
+    type:'bar',
+    data:{labels:['Registered','Attended','Stayed 50%+','Completed 80%+'],datasets:[{data:[registrants,n,half,completed],backgroundColor:['#262F3A','#8A8E91','#FF9933','#239646'],borderRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+      x:{ticks:{font:{size:9},color:'#949494'},grid:{display:false}},
+      y:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}}
+    }}
+  });
+
+  // Insights
+  let maxDrop=0,maxT=0;
+  for(let i=1;i<intervals.length;i++){const d=intervals[i-1].present-intervals[i].present;if(d>maxDrop){maxDrop=d;maxT=intervals[i].t;}}
+  const bigPct=Math.round((maxDrop/n)*100);
+  const latePct=Math.round((attendees.filter(a=>a.join>5).length/n)*100);
+  const halfPct=Math.round((half/n)*100);
+
+  const insights=[
+    showUp<40
+      ? {type:'negative',icon:'📉',title:'Low show-up rate',text:`Only ${showUp}% of registrants attended. Fix your reminder sequence — send at 24hrs, 1hr, and 10 minutes before.`}
+      : {type:'positive',icon:'✅',title:'Strong show-up rate',text:`${showUp}% show-up rate is ${showUp>=50?'above':'at'} industry average. Your pre-webinar sequence is working.`},
+    maxT>0
+      ? {type:bigPct>15?'negative':'warning',icon:'⚠️',title:`Biggest drop at ${maxT} min`,text:`${bigPct}% of attendees left at the ${maxT}-minute mark. Review exactly what was being presented then — this is your content problem.`}
+      : {type:'positive',icon:'📈',title:'Steady retention',text:'No single major drop-off point detected. Your content is holding attention consistently throughout.'},
+    earlyPct>20
+      ? {type:'negative',icon:'🚪',title:'High early exit rate',text:`${earlyPct}% left within 10 minutes. Your hook is not landing. Rewrite the first 5 minutes.`}
+      : {type:'positive',icon:'🎯',title:'Opening is working',text:`Only ${earlyPct}% left in the first 10 minutes. Your hook is strong — people are staying to hear the story.`},
+    compRate<35
+      ? {type:'negative',icon:'📊',title:'Completion needs work',text:`Only ${compRate}% stayed for 80%+ of the webinar. People are leaving before your close. Move your offer earlier or cut the middle section.`}
+      : compRate<55
+        ? {type:'warning',icon:'📊',title:'Moderate completion',text:`${compRate}% completion. Test a pattern interrupt at the 35-40 min mark to re-engage before your close.`}
+        : {type:'positive',icon:'📊',title:'Strong completion',text:`${compRate}% stayed for 80%+ of the session. This audience is primed to convert — review your close.`},
+    latePct>30
+      ? {type:'warning',icon:'⏰',title:`${latePct}% joined late`,text:'Over a third missed the opening. Check your reminder timing and links. Also review whether your start time suits your audience.'}
+      : {type:'positive',icon:'⏰',title:'Good punctuality',text:`${100-latePct}% joined within the first 5 minutes. Your audience is showing up ready and engaged.`},
+    halfPct>=60
+      ? {type:'positive',icon:'💡',title:'Strong mid-webinar hold',text:`${halfPct}% stayed past the halfway point. Your content structure is solid. Focus your energy on the close.`}
+      : {type:'warning',icon:'💡',title:'Mid-webinar drop-off',text:`Only ${halfPct}% passed the halfway mark. Add a re-engagement moment at the midpoint — a bold claim, a quick win, or a story shift.`}
+  ];
+
+  document.getElementById('insightsGrid').innerHTML = insights.map(i=>`
+    <div class="insight-card ${i.type}">
+      <div class="insight-icon">${i.icon}</div>
+      <div class="insight-title">${i.title}</div>
+      <div class="insight-text">${i.text}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
