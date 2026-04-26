@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webinar Autopsy Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--dark:#1A1A1A;--mid:#8A8E91;--light:#F7F7F5;--white:#FFFFFF;--accent:#FF9933;--green:#239646;--red:#FE0032;--navy:#062B4F;--border:#E8E8E4;--muted:#AAAAAA;--step:#FF9933}
+body{font-family:'Montserrat',sans-serif;background:var(--light);color:var(--dark);min-height:100vh}
+
+/* ── INTAKE PAGE ── */
+.intake-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;background:var(--light);position:relative;overflow:hidden}
+.intake-page::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 900px 600px at 60% 20%,rgba(255,153,51,0.06) 0%,transparent 70%);pointer-events:none}
+.intake-page::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 400px at 20% 80%,rgba(26,26,26,0.04) 0%,transparent 60%);pointer-events:none}
+.intake-wrap{width:100%;max-width:560px;position:relative;z-index:1}
+.intake-header{text-align:center;margin-bottom:32px}
+.intake-title{font-family:'Oswald',sans-serif;font-size:32px;letter-spacing:2px;text-transform:uppercase;color:var(--dark);margin-bottom:6px;font-weight:600}
+.intake-title span{color:var(--accent)}
+.intake-sub{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── STEP CARDS ── */
+.step-card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:12px;overflow:hidden;transition:box-shadow 0.2s}
+.step-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.06)}
+.step-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.step-num{width:26px;height:26px;min-width:26px;background:var(--accent);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'Oswald',sans-serif}
+.step-num.inactive{background:#E8E8E4;color:#AAAAAA}
+.step-title{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--dark);font-weight:500}
+.step-badge{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-left:auto;background:var(--light);padding:3px 8px;border-radius:20px;font-weight:600}
+.step-body{padding:16px 20px}
+
+/* ── CSV UPLOAD ── */
+.csv-drop{border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--white)}
+.csv-drop:hover,.csv-drop.has-file{border-color:var(--accent);background:#FFFAF5}
+.csv-drop-icon{font-size:22px;margin-bottom:8px;opacity:0.4}
+.csv-drop-title{font-size:13px;font-weight:600;color:var(--dark);margin-bottom:4px}
+.csv-drop-sub{font-size:11px;color:var(--muted);margin-bottom:12px}
+.csv-drop-btn{background:var(--dark);color:white;border:none;padding:8px 18px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:6px;transition:background 0.2s;display:inline-block}
+.csv-drop-btn:hover{background:#333}
+.csv-file-name{font-size:11px;color:var(--green);font-weight:600;margin-top:8px}
+.how-to-link{display:inline-block;margin-top:10px;font-size:11px;color:var(--muted);text-decoration:none;cursor:pointer;background:none;border:none;font-family:'Montserrat',sans-serif;padding:0}
+.how-to-link:hover{color:var(--dark)}
+
+/* ── FORM GRID ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.form-input{padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--dark);background:var(--light);transition:all 0.2s}
+.form-input:focus{outline:none;border-color:var(--accent);background:white}
+select.form-input{cursor:pointer}
+textarea.form-input{resize:vertical;min-height:60px;max-height:120px}
+
+/* ── OPTIONAL FILE UPLOADS ── */
+.upload-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.upload-mini{border:1.5px dashed var(--border);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s}
+.upload-mini:hover,.upload-mini.has-file{border-color:var(--accent);background:#FFFAF5}
+.upload-mini-title{font-size:10px;font-weight:600;color:var(--dark);letter-spacing:0.5px;margin-bottom:3px}
+.upload-mini-sub{font-size:10px;color:var(--muted);margin-bottom:8px}
+.upload-mini-btn{background:transparent;border:1px solid var(--border);color:var(--dark);padding:5px 12px;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all 0.2s}
+.upload-mini-btn:hover{border-color:var(--dark)}
+.upload-file-name{font-size:10px;color:var(--green);font-weight:600;margin-top:5px}
+
+/* ── RUN BUTTON ── */
+.run-btn{width:100%;background:var(--dark);color:white;border:none;padding:15px;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-radius:10px;transition:all 0.2s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:10px}
+.run-btn:hover{background:#333;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.15)}
+.run-btn:active{transform:translateY(0)}
+.run-btn .run-dot{width:8px;height:8px;background:var(--accent);border-radius:50%}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none}
+main{max-width:1200px;margin:0 auto;padding:40px 24px}
+.section-label{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--mid);margin-bottom:14px}
+.info-bar{background:var(--dark);color:white;padding:16px 24px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.info-bar-title{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+.info-bar-meta{font-size:12px;color:var(--mid);margin-top:2px}
+.wbadge{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:20px;border:1px solid var(--accent);color:var(--accent)}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
+.mc{background:var(--white);border-radius:10px;padding:18px;border-left:3px solid transparent}
+.mc.good{border-left-color:var(--green)}.mc.warn{border-left-color:var(--accent)}.mc.bad{border-left-color:var(--red)}.mc.neutral{border-left-color:var(--dark)}
+.ml{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:600}
+.mv{font-family:'Oswald',sans-serif;font-size:30px;font-weight:600;color:var(--dark);line-height:1;margin-bottom:4px}
+.ms{font-size:11px;color:var(--muted)}
+.mb{font-size:10px;margin-top:5px;padding:3px 8px;border-radius:20px;display:inline-block;font-weight:600}
+.bg{background:#eaf3de;color:#239646}.bw{background:#fff4e6;color:#cc7700}.bb{background:#fff0f0;color:#cc0000}
+.validation-block{background:var(--white);border-radius:10px;padding:20px;margin-bottom:24px;border-left:3px solid var(--accent)}
+.validation-title{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.validation-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.vitem{display:flex;flex-direction:column;gap:3px}
+.vitem-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.vitem-value{font-family:'Oswald',sans-serif;font-size:18px;font-weight:600;color:var(--dark)}
+.vitem-sub{font-size:10px;color:var(--muted)}
+.warning-banner{background:#fff4e6;border:1px solid #FF9933;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:11px;color:#cc7700;line-height:1.6}
+.warning-banner strong{color:#cc7700}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat-mini{background:var(--white);border-radius:10px;padding:14px;text-align:center}
+.stat-mini-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-weight:600}
+.stat-mini-value{font-family:'Oswald',sans-serif;font-size:20px;font-weight:600;color:var(--dark)}
+.stat-mini-unit{font-size:11px;font-weight:400;color:var(--muted)}
+.chart-full{background:var(--white);border-radius:10px;padding:22px;margin-bottom:14px;position:relative}
+.charts-row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.chart-card{background:var(--white);border-radius:10px;padding:18px;position:relative}
+.ct{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);margin-bottom:3px}
+.cs{font-size:11px;color:var(--muted);margin-bottom:14px}
+.expand-hint{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;cursor:pointer;background:none;border:1px solid var(--border);padding:3px 8px;border-radius:20px;font-family:'Oswald',sans-serif;white-space:nowrap}
+.expand-hint:hover{border-color:var(--accent);color:var(--accent)}
+.chart-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:8px}
+.chart-header-left{flex:1}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.legend span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mid)}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:24px}
+.insight-card{background:var(--white);border-radius:10px;padding:18px;border-top:3px solid var(--dark);cursor:pointer;transition:box-shadow 0.2s}
+.insight-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.insight-card.positive{border-top-color:var(--green)}.insight-card.warning{border-top-color:var(--accent)}.insight-card.negative{border-top-color:var(--red)}
+.ii{font-size:18px;margin-bottom:8px}
+.it{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);margin-bottom:5px}
+.ix{font-size:12px;color:var(--mid);line-height:1.6}
+.dl-bar{background:var(--white);border-radius:10px;padding:20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.dl-text .section-label{margin-bottom:3px}
+.dl-desc{font-size:12px;color:var(--muted)}
+.reset-btn{background:transparent;color:var(--mid);border:1px solid rgba(138,142,145,0.3);padding:8px 18px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all 0.2s}
+.reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--dark);color:white;border:none;padding:10px 22px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:6px;transition:background 0.2s}
+.btn-primary:hover{background:#333}
+.btn-coming{background:#ccc;color:white;border:none;padding:10px 22px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:not-allowed;border-radius:6px;opacity:0.7}
+#sidePanel{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:var(--white);box-shadow:-4px 0 24px rgba(0,0,0,0.12);z-index:1000;transition:right 0.3s ease;overflow-y:auto;display:flex;flex-direction:column}
+#sidePanel.open{right:0}
+.ph{background:var(--dark);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.pt{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:white}
+.pc{background:none;border:none;color:var(--mid);cursor:pointer;font-size:20px;line-height:1}
+.pc:hover{color:white}
+.pb{padding:22px;flex:1}
+.ps{margin-bottom:18px}
+.pst{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:7px}
+.ptx{font-size:13px;color:var(--dark);line-height:1.7}
+.chat-section{border-top:1px solid var(--border);padding:18px 22px;flex-shrink:0}
+.chat-title{font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mid);margin-bottom:10px}
+.chat-messages{max-height:280px;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.cm{padding:10px 13px;border-radius:8px;font-size:12px;line-height:1.6;max-width:92%}
+.cm.user{background:var(--dark);color:white;align-self:flex-end}
+.cm.ai{background:var(--light);color:var(--dark);align-self:flex-start}
+.cm.loading{color:var(--muted);font-style:italic}
+.chat-input-row{display:flex;gap:7px}
+.ci{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-family:'Montserrat',sans-serif;font-size:12px;color:var(--dark);background:white}
+.ci:focus{outline:none;border-color:var(--dark)}
+.cs-btn{background:var(--dark);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px}
+.cs-btn:hover{background:#333}
+.chat-summary-prompt{background:var(--light);border:1px solid var(--border);border-radius:8px;padding:12px;margin-top:10px;text-align:center;font-size:12px;color:var(--mid)}
+.chat-summary-prompt button{background:var(--accent);color:white;border:none;padding:6px 16px;font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;border-radius:6px;margin-top:8px}
+#aiFloatBtn{position:fixed;bottom:28px;right:28px;z-index:900;background:var(--dark);color:white;border:none;border-radius:50px;padding:13px 22px;font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.25);display:none;align-items:center;gap:8px;transition:background 0.2s}
+#aiFloatBtn:hover{background:#333}
+#aiFloatBtn .ai-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(26,26,26,0.92);z-index:2000;align-items:center;justify-content:center;padding:40px}
+#lightbox.open{display:flex}
+#lbInner{background:var(--white);border-radius:12px;padding:28px;width:100%;max-width:900px;max-height:90vh;overflow:auto;position:relative}
+#lbClose{position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--mid)}
+#lbClose:hover{color:var(--dark)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(26,26,26,0.85);z-index:3000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--white);border-radius:12px;padding:28px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--mid)}
+.modal-title{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:var(--dark);margin-bottom:16px;padding-right:24px}
+footer{background:var(--dark);color:var(--mid);text-align:center;padding:18px;font-size:11px;letter-spacing:1px;margin-top:40px}
+@media(max-width:768px){main{padding:24px 16px}.metrics-grid{grid-template-columns:1fr 1fr}.charts-row-2{grid-template-columns:1fr}.insights-grid{grid-template-columns:1fr}.form-grid,.upload-pair{grid-template-columns:1fr}#sidePanel{width:100%;right:-100%}.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ── INTAKE PAGE ── -->
+<div class="intake-page" id="intakeSection">
+  <div class="intake-wrap">
+
+    <div class="intake-header">
+      <div class="intake-title">Webinar Autopsy <span>Pro</span></div>
+      <p class="intake-sub">Upload your Zoom attendance data and get instant drop-off analysis, retention metrics, and conversion intelligence.</p>
+    </div>
+
+    <!-- STEP 1: CSV UPLOAD -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">Zoom Attendance Report</div>
+        <span class="step-badge">Required</span>
+      </div>
+      <div class="step-body">
+        <div class="csv-drop" id="csvDrop" onclick="document.getElementById('csvInput').click()">
+          <div class="csv-drop-icon">&#8679;</div>
+          <div class="csv-drop-title">Upload your CSV file</div>
+          <div class="csv-drop-sub">Zoom participants export — one file, that's all you need</div>
+          <div class="csv-drop-btn">Choose file</div>
+          <div class="csv-file-name" id="csvName"></div>
+          <input type="file" id="csvInput" accept=".csv" style="display:none" onchange="handleCSVSelect(event)">
+        </div>
+        <button class="how-to-link" onclick="openModal('csvModal')">How to export your attendance report from Zoom →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: SESSION DETAILS -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">Session Details</div>
+        <span class="step-badge">Recommended</span>
+      </div>
+      <div class="step-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Webinar name</label>
+            <input class="form-input" id="fName" type="text" placeholder="e.g. Crypto Masterclass — April 2026">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Webinar date</label>
+            <input class="form-input" id="fDate" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Event type</label>
+            <select class="form-input" id="fType">
+              <option value="">Select event type</option>
+              <option value="Masterclass">Masterclass</option>
+              <option value="Programme">Programme</option>
+              <option value="Webinar">Webinar</option>
+              <option value="Workshop">Workshop</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <select class="form-input" id="fDuration">
+              <option value="">Select duration</option>
+              <option value="90 minutes">90 minutes</option>
+              <option value="2 hours">2 hours</option>
+              <option value="4 hours">4 hours</option>
+              <option value="6 hours">6 hours</option>
+              <option value="1 day">1 day</option>
+              <option value="2 days">2 days</option>
+              <option value="3 days">3 days</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Specific focus <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></label>
+            <textarea class="form-input" id="fFocus" placeholder="e.g. Why did people drop off in the first 30 minutes? Is the close section working?"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: OPTIONAL FILES -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num inactive">3</div>
+        <div class="step-title" style="color:var(--muted)">Supporting Files</div>
+        <span class="step-badge">Optional</span>
+      </div>
+      <div class="step-body">
+        <div class="upload-pair">
+          <div class="upload-mini" id="transcriptBox" onclick="document.getElementById('transcriptInput').click()">
+            <div class="upload-mini-title">Transcript</div>
+            <div class="upload-mini-sub">.vtt or .txt</div>
+            <button class="upload-mini-btn" onclick="event.stopPropagation();document.getElementById('transcriptInput').click()">Choose file</button>
+            <div class="upload-file-name" id="transcriptName"></div>
+            <input type="file" id="transcriptInput" accept=".vtt,.txt,.srt" style="display:none" onchange="handleOptionalFile(event,'transcript')">
+            <br>
+            <button class="how-to-link" onclick="event.stopPropagation();openModal('transcriptModal')" style="font-size:10px;margin-top:6px">How to get transcript →</button>
+          </div>
+          <div class="upload-mini" id="syntaxBox" onclick="document.getElementById('syntaxInput').click()">
+            <div class="upload-mini-title">Event Syntax</div>
+            <div class="upload-mini-sub">.docx or .pdf</div>
+            <button class="upload-mini-btn" onclick="event.stopPropagation();document.getElementById('syntaxInput').click()">Choose file</button>
+            <div class="upload-file-name" id="syntaxName"></div>
+            <input type="file" id="syntaxInput" accept=".docx,.pdf,.doc" style="display:none" onchange="handleOptionalFile(event,'syntax')">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUN ANALYSIS -->
+    <button class="run-btn" onclick="runAnalysis()">
+      <span class="run-dot"></span>
+      Run Analysis
+    </button>
+
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard">
+  <main>
+    <div class="info-bar">
+      <div>
+        <div class="info-bar-title" id="dbTitle">Webinar Report</div>
+        <div class="info-bar-meta" id="dbMeta"></div>
+      </div>
+      <span class="wbadge" id="dbType">Webinar Autopsy Pro</span>
+    </div>
+
+    <div class="validation-block" id="validationBlock">
+      <div class="validation-title">Data Quality Report</div>
+      <div id="warningBanners"></div>
+      <div class="validation-grid" id="validationGrid"></div>
+    </div>
+
+    <p class="section-label">Performance summary</p>
+    <div class="metrics-grid" id="metricCards"></div>
+
+    <p class="section-label">Attendance distribution</p>
+    <div class="stats-row" id="statsRow"></div>
+
+    <p class="section-label">Attendance &amp; drop-off analysis <span style="font-size:10px;color:var(--muted);letter-spacing:0;text-transform:none;font-family:'Montserrat',sans-serif">— click any data point for insight · click Enlarge to expand</span></p>
+
+    <div class="chart-full" id="dropoffWrap">
+      <div class="chart-header">
+        <div class="chart-header-left">
+          <div class="ct">Attendee retention over time</div>
+          <div class="cs">How many unique people were in the room at each minute — red spikes show exactly when people left</div>
+          <div class="legend">
+            <span><span class="ld" style="background:#1A1A1A"></span>Unique attendees present</span>
+            <span><span class="ld" style="background:#FE0032"></span>Drop-off events</span>
+          </div>
+        </div>
+        <button class="expand-hint" onclick="openLightbox('dropoff')">Enlarge</button>
+      </div>
+      <div style="position:relative;width:100%;height:280px"><canvas id="dropoffChart"></canvas></div>
+    </div>
+
+    <div class="charts-row-2">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <div class="ct">When people joined</div>
+            <div class="cs">Based on first join per unique attendee</div>
+          </div>
+          <button class="expand-hint" onclick="openLightbox('join')">Enlarge</button>
+        </div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="joinChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-header-left">
+            <div class="ct">Registration to completion funnel</div>
+            <div class="cs">Where you lost people from sign-up through to the close</div>
+          </div>
+          <button class="expand-hint" onclick="openLightbox('funnel')">Enlarge</button>
+        </div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="funnelChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom:14px">
+      <div class="chart-header">
+        <div class="chart-header-left">
+          <div class="ct">Time in session</div>
+          <div class="cs">Total attendance per unique attendee — red = left early, green = stayed to the close</div>
+        </div>
+        <button class="expand-hint" onclick="openLightbox('dur')">Enlarge</button>
+      </div>
+      <div style="position:relative;width:100%;height:190px"><canvas id="durChart"></canvas></div>
+    </div>
+
+    <p class="section-label">Conversion intelligence</p>
+    <div class="insights-grid" id="insightsGrid"></div>
+
+    <div class="dl-bar">
+      <div class="dl-text">
+        <p class="section-label" style="margin-bottom:3px">Download &amp; export</p>
+        <p class="dl-desc">Save or share this analysis</p>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button class="btn-primary" onclick="downloadPDF()">Download PDF</button>
+        <button class="btn-primary" onclick="downloadPPTX()" style="background:var(--accent);color:white">Download PowerPoint</button>
+        <button class="reset-btn" onclick="resetDashboard()">New report</button>
+      </div>
+    </div>
+  </main>
+  <footer>Webinar Autopsy Pro &nbsp;&middot;&nbsp; Internal use only</footer>
+</div>
+
+<!-- FLOATING AI BUTTON -->
+<button id="aiFloatBtn" onclick="openAIChat()">
+  <span class="ai-dot"></span>
+  Ask AI
+</button>
+
+<!-- SIDE PANEL -->
+<div id="sidePanel">
+  <div class="ph">
+    <span class="pt" id="panelTitle">Analysis</span>
+    <button class="pc" onclick="closePanel()">&#x2715;</button>
+  </div>
+  <div class="pb" id="panelBody"></div>
+  <div class="chat-section">
+    <div class="chat-title">Ask the Autopsy AI <span style="font-size:9px;color:var(--muted);font-family:'Montserrat',sans-serif;letter-spacing:0;text-transform:none;font-weight:400">— requires API key setup</span></div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div id="summaryPrompt" style="display:none" class="chat-summary-prompt">
+      <div>Ready to wrap up?</div>
+      <button onclick="requestSummary()">Get full session summary</button>
+    </div>
+    <div class="chat-input-row">
+      <input class="ci" id="chatInput" type="text" placeholder="Ask about your results..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="cs-btn" onclick="sendChat()">Ask</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox(event)">
+  <div id="lbInner">
+    <button id="lbClose" onclick="closeLightbox()">&#x2715;</button>
+    <div class="ct" id="lbTitle" style="margin-bottom:18px;font-size:14px"></div>
+    <div style="position:relative;width:100%;height:420px"><canvas id="lbChart"></canvas></div>
+  </div>
+</div>
+
+<!-- CSV EXPORT MODAL -->
+<div class="modal-overlay" id="csvModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('csvModal')">&#x2715;</button>
+    <div class="modal-title">How to export from Zoom</div>
+    <ol style="font-size:13px;color:var(--mid);line-height:2;padding-left:20px;margin-bottom:16px">
+      <li>Log in to Zoom on the web</li>
+      <li>Click <strong style="color:var(--dark)">Reports</strong> in the left side panel</li>
+      <li>Click <strong style="color:var(--dark)">Meeting and webinar history</strong></li>
+      <li>Select your date range to find your webinar</li>
+      <li>Click on the webinar you want to analyse</li>
+      <li>Click the blue number in the <strong style="color:var(--dark)">Participants</strong> column</li>
+      <li>Click <strong style="color:var(--dark)">Export</strong> (top right) — do not filter</li>
+      <li>Upload the CSV here</li>
+    </ol>
+    <div style="background:#fff4e6;border-radius:8px;padding:14px;font-size:12px;color:#cc7700;line-height:1.6">
+      <strong>Don't see the export option?</strong> You may need account admin access. Ask your operations team to enable reporting under Account Management → Reports.
+    </div>
+  </div>
+</div>
+
+<!-- TRANSCRIPT MODAL -->
+<div class="modal-overlay" id="transcriptModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('transcriptModal')">&#x2715;</button>
+    <div class="modal-title">How to get your Zoom transcript</div>
+    <p style="font-size:13px;color:var(--dark);line-height:1.7;margin-bottom:16px">Zoom transcripts are generated automatically when <strong>cloud recording with audio transcription</strong> is enabled.</p>
+    <ol style="font-size:13px;color:var(--mid);line-height:1.8;padding-left:20px;margin-bottom:16px">
+      <li>Log in to Zoom on the web</li>
+      <li>Go to <strong style="color:var(--dark)">Recordings</strong> in the left panel</li>
+      <li>Find your webinar recording and click on it</li>
+      <li>Look for a <strong style="color:var(--dark)">.vtt</strong> or <strong style="color:var(--dark)">Audio Transcript</strong> file</li>
+      <li>Download and upload it here</li>
+    </ol>
+    <div style="background:#fff4e6;border-radius:8px;padding:14px;margin-bottom:14px">
+      <p style="font-size:12px;color:#cc7700;font-weight:600;margin-bottom:4px">Don't see a transcript file?</p>
+      <p style="font-size:12px;color:var(--mid);line-height:1.6">Ask your operations team to enable <strong>Audio transcript</strong> under <strong>Settings → Recording → Cloud recording</strong>.</p>
+    </div>
+    <p style="font-size:11px;color:var(--muted)">Accepted formats: .vtt, .txt, .srt</p>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let S = {
+  attendees:[],rawRowCount:0,excludedCount:0,rejoinCount:0,ambiguousCount:0,
+  dedupeMethod:'',totalEmailDeduped:0,totalNameDeduped:0,total:0,
+  registrants:0,registrantsFromSource:false,meta:{},insights:[],
+  intervals:[],dropoffs:[],chatCount:0,
+  joinBuckets:[],joinData:[],durBuckets:[],durData:[],
+  funnelData:[],compLabel:'',half:0,completed:0,
+  transcriptBlocks:[],sessionStartMs:null
+};
+let charts={},lbChart=null;
+let transcriptText='',syntaxText='',csvData=null,csvFileName='';
+
+// ─── VTT PARSER ───────────────────────────────────────────────────────────────
+// Parses a Zoom VTT file into an array of {startSec, endSec, speaker, text}
+function parseVTT(vttText){
+  const lines=vttText.split('\n');
+  const blocks=[];
+  let i=0;
+  while(i<lines.length){
+    const line=lines[i].trim();
+    // Look for timestamp lines: 00:00:13.790 --> 00:00:18.639
+    const tsMatch=line.match(/(\d+):(\d{2}):(\d{2})[.,](\d+)\s*-->\s*(\d+):(\d{2}):(\d{2})[.,](\d+)/);
+    if(tsMatch){
+      const startSec=parseInt(tsMatch[1])*3600+parseInt(tsMatch[2])*60+parseInt(tsMatch[3])+parseInt(tsMatch[4])/1000;
+      const endSec=parseInt(tsMatch[5])*3600+parseInt(tsMatch[6])*60+parseInt(tsMatch[7])+parseInt(tsMatch[8])/1000;
+      // Next lines are text until blank line
+      i++;
+      let speaker='',text='';
+      while(i<lines.length&&lines[i].trim()!==''){
+        const textLine=lines[i].trim();
+        // Zoom VTT format: "Speaker Name: text" on first text line
+        if(!speaker&&textLine.includes(':')){
+          const colonIdx=textLine.indexOf(':');
+          const potentialSpeaker=textLine.substring(0,colonIdx).trim();
+          // Speaker names are typically short (< 40 chars) and don't have too many spaces
+          if(potentialSpeaker.length<40&&potentialSpeaker.split(' ').length<=4){
+            speaker=potentialSpeaker;
+            text+=textLine.substring(colonIdx+1).trim()+' ';
+          } else {
+            text+=textLine+' ';
+          }
+        } else {
+          text+=textLine+' ';
+        }
+        i++;
+      }
+      if(text.trim()){
+        blocks.push({startSec,endSec,speaker:speaker||'Speaker',text:text.trim()});
+      }
+    } else {
+      i++;
+    }
+  }
+  return blocks;
+}
+
+// Get transcript bullets for a given minute window (blockStart to blockEnd minutes from session start)
+// Returns array of {speaker, lines:[]} grouped by speaker
+function getTranscriptForWindow(startMin,endMin){
+  if(!S.transcriptBlocks||!S.transcriptBlocks.length)return null;
+  const startSec=startMin*60;
+  const endSec=endMin*60;
+  // Filter blocks that overlap this window
+  const relevant=S.transcriptBlocks.filter(b=>b.endSec>=startSec&&b.startSec<=endSec&&b.text.trim().length>3);
+  if(!relevant.length)return null;
+  // Group consecutive lines by speaker
+  const grouped=[];
+  for(const b of relevant){
+    if(grouped.length&&grouped[grouped.length-1].speaker===b.speaker){
+      grouped[grouped.length-1].lines.push(b.text);
+    } else {
+      grouped.push({speaker:b.speaker,lines:[b.text]});
+    }
+  }
+  return grouped;
+}
+
+const EXCLUDE_PATTERNS=['investmentmastery','investment mastery','media room','mediaroom','host','co-host','cohost','admin','administrator','test account','testaccount','test user','testuser'];
+
+function isInternalAccount(name,email){
+  const n=(name||'').toLowerCase().trim(),e=(email||'').toLowerCase().trim();
+  for(const p of EXCLUDE_PATTERNS)if(n.includes(p)||e.includes(p))return true;
+  return false;
+}
+function normaliseName(name){
+  if(!name)return '';
+  return name.trim().replace(/\s+/g,' ').toLowerCase().replace(/[^\w\s]/g,'');
+}
+
+const IM_CTX=`You are a conversion intelligence specialist embedded inside Webinar Autopsy Pro — an internal webinar analysis tool. You are direct, sharp, and operate at elite level. Think Leila Hormozi — no fluff, no padding.
+
+BUSINESS CONTEXT:
+- Premium financial education company, 26+ years experience
+- 93.4% of clients achieve profitability
+- Key social proof: Dennis (£1.5m), Gillian Duff (£279k), Tracy Hilliard (£550k tax-free)
+- Guarantee: 1 year — follow strategies, if no results, we work with you
+
+EVENT TYPES & OFFERS:
+- CC1 (4hr Crypto Masterclass) → YCC membership £2,497+VAT
+- SM1 (4hr Stocks Masterclass) → YTC membership £2,497+VAT
+- CEST 90min Webinar → £97 entry product
+- CEST 2-Day Programme → CET Certified Elite Trader £6,997+VAT
+- WCM Wealth Creation Masterclass → soft sell, books calls
+- HMM Hybrid Members Meeting → upsell to MCP £4,997 / GFT £9,995
+- 3 Day Workshop → Gold Fast Track £9,995
+- Emergency Webinars → urgency-driven, YCC
+
+AUDIENCE: Career professionals & business owners. Fear of loss, scepticism, busy. Want financial freedom.
+
+CLOSE FRAMEWORK (Russell Brunson Perfect Webinar): Eliminate 3 beliefs: vehicle, self, risk. Close starts at 80-85% through the event.
+
+YOUR ROLE: Analyse drop-off data. Give direct, actionable conversion advice. Flag what's broken first. Do not flag end-of-session drop-off as a problem — people leaving in the final 5% of a session is normal.`;
+
+// ─── CSV HANDLING — file attaches, nothing runs ───────────────────────────────
+function handleCSVSelect(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  csvFileName=file.name;
+  document.getElementById('csvName').textContent='✓ '+file.name;
+  document.getElementById('csvDrop').classList.add('has-file');
+  const reader=new FileReader();
+  reader.onload=ev=>{csvData=ev.target.result;};
+  reader.readAsText(file);
+}
+
+// ─── ANALYSIS — only runs when user clicks Run Analysis ───────────────────────
+function runAnalysis(){
+  if(!csvData){alert('Please upload a Zoom attendance CSV first.');return;}
+  const rows=parseCSV(csvData);
+  if(!rows){alert('Could not read CSV. Check format.');return;}
+  const result=deduplicateRows(rows);
+  if(!result){alert('Could not parse timestamps. Ensure you are using the Zoom attendee report CSV.');return;}
+  S.meta={
+    name:document.getElementById('fName').value||csvFileName.replace('.csv',''),
+    date:document.getElementById('fDate').value||new Date().toLocaleDateString('en-GB'),
+    type:document.getElementById('fType').value||'',
+    duration:document.getElementById('fDuration').value||'',
+    focus:document.getElementById('fFocus').value||''
+  };
+  runDashboard(result,null);
+}
+
+function handleOptionalFile(e,type){
+  const file=e.target.files[0];
+  if(!file)return;
+  document.getElementById(type+'Name').textContent='✓ '+file.name;
+  document.getElementById(type+'Box').classList.add('has-file');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(type==='transcript'){
+      transcriptText=ev.target.result; // full file, no truncation
+      S.transcriptBlocks=parseVTT(transcriptText); // parse immediately
+    } else {
+      syntaxText=ev.target.result.substring(0,6000);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ─── PARSE CSV ─────────────────────────────────────────────────────────────────
+function parseCSV(text){
+  const lines=text.split('\n').filter(l=>l.trim());
+  if(lines.length<2)return null;
+  const headers=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const cols=lines[i].match(/(".*?"|[^,]+)(?=,|$)/g)||lines[i].split(',');
+    if(!cols||cols.length<3)continue;
+    const row={};
+    headers.forEach((h,j)=>row[h]=(cols[j]||'').trim().replace(/^"|"$/g,''));
+    rows.push(row);
+  }
+  return rows;
+}
+
+function parseTs(s){
+  if(!s)return null;
+  const clean=s.trim().replace(/^"|"$/g,'');
+  let m=clean.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})/);
+  if(m)return new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5],+m[6]);
+  m=clean.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})/);
+  if(m)return new Date(+m[3],+m[1]-1,+m[2],+m[4],+m[5],+m[6]);
+  return null;
+}
+
+function deduplicateRows(rows){
+  const jk=Object.keys(rows[0]).find(k=>k.includes('join'));
+  const lk=Object.keys(rows[0]).find(k=>k.includes('leave'));
+  const dk=Object.keys(rows[0]).find(k=>k.includes('duration'));
+  const nk=Object.keys(rows[0]).find(k=>k.includes('name'));
+  const ek=Object.keys(rows[0]).find(k=>k.includes('email')||k.includes('user email'));
+  if(!jk||!lk)return null;
+  let rawRowCount=0,excludedCount=0,totalEmailDeduped=0,totalNameDeduped=0,ambiguousCount=0;
+  const sessionRecords=[];
+  for(const r of rows){
+    rawRowCount++;
+    const name=nk?r[nk]:'',email=ek?r[ek]:'';
+    if(isInternalAccount(name,email)){excludedCount++;continue;}
+    const join=parseTs(r[jk]),leave=parseTs(r[lk]);
+    if(!join||!leave)continue;
+    const dur=dk?parseInt(r[dk]):NaN;
+    sessionRecords.push({name,email,join,leave,dur});
+  }
+  if(!sessionRecords.length)return null;
+  const attendeeMap=new Map(),nameOnlyAttendees=new Map();
+  for(const rec of sessionRecords){
+    const normEmail=(rec.email||'').toLowerCase().trim();
+    const normName=normaliseName(rec.name);
+    let key;
+    if(normEmail){key='email:'+normEmail;totalEmailDeduped++;}
+    else if(normName){
+      key='name:'+normName;totalNameDeduped++;
+      if(!nameOnlyAttendees.has(normName))nameOnlyAttendees.set(normName,0);
+      nameOnlyAttendees.set(normName,nameOnlyAttendees.get(normName)+1);
+    }else continue;
+    if(!attendeeMap.has(key))attendeeMap.set(key,{name:rec.name,email:rec.email,sessions:[]});
+    attendeeMap.get(key).sessions.push({join:rec.join,leave:rec.leave,dur:rec.dur});
+  }
+  for(const[name,count]of nameOnlyAttendees)if(count>=5)ambiguousCount++;
+  let globalMinJoin=null;
+  for(const att of attendeeMap.values())for(const s of att.sessions)if(!globalMinJoin||s.join<globalMinJoin)globalMinJoin=s.join;
+  if(!globalMinJoin)return null;
+  S.sessionStartMs=globalMinJoin.getTime(); // store for transcript sync
+  const GRACE=60000;let rejoinCount=0;
+  const attendees=[];
+  for(const att of attendeeMap.values()){
+    att.sessions.sort((a,b)=>a.join-b.join);
+    if(att.sessions.length>1)rejoinCount+=att.sessions.length-1;
+    const merged=[];
+    for(const s of att.sessions){
+      if(!merged.length){merged.push({join:s.join,leave:s.leave});}
+      else{
+        const last=merged[merged.length-1];
+        if(s.join.getTime()-last.leave.getTime()<=GRACE)last.leave=s.leave>last.leave?s.leave:last.leave;
+        else merged.push({join:s.join,leave:s.leave});
+      }
+    }
+    const totalDuration=merged.reduce((sum,s)=>sum+Math.max(0,Math.round((s.leave-s.join)/60000)),0);
+    const firstJoinMin=Math.round((att.sessions[0].join-globalMinJoin)/60000);
+    const lastLeaveMin=Math.round((att.sessions[att.sessions.length-1].leave-globalMinJoin)/60000);
+    attendees.push({name:att.name,joinMin:firstJoinMin,leaveMin:lastLeaveMin,duration:totalDuration,sessionCount:att.sessions.length,
+      mergedIntervals:merged.map(s=>({joinMin:Math.round((s.join-globalMinJoin)/60000),leaveMin:Math.round((s.leave-globalMinJoin)/60000)}))});
+  }
+  const total=Math.max(...attendees.map(a=>a.leaveMin));
+  let dedupeMethod='';
+  if(totalEmailDeduped>0&&totalNameDeduped>0)dedupeMethod='Email (where available) → normalised name';
+  else if(totalEmailDeduped>0)dedupeMethod='Email';
+  else dedupeMethod='Normalised name only';
+  return{attendees,total,rawRowCount,excludedCount,rejoinCount,ambiguousCount,dedupeMethod,totalEmailDeduped,totalNameDeduped};
+}
+
+// ─── SAMPLE DATA ──────────────────────────────────────────────────────────────
+function loadSample(){
+  const total=90,people=[];
+  for(let i=0;i<130;i++)people.push({name:'Attendee '+(i+1),email:i%3===0?'':'attendee'+(i+1)+'@example.com'});
+  const baseDate=new Date(2026,0,1,10,0,0),toDate=m=>new Date(baseDate.getTime()+m*60000);
+  const attendeeMap=new Map();
+  let globalMin=baseDate;
+  for(let i=0;i<130;i++){
+    const p=people[i];
+    const jm=Math.random()<0.7?Math.floor(Math.random()*4):Math.floor(Math.random()*20);
+    let lm;const r=Math.random();
+    if(r<0.35)lm=total;else if(r<0.50)lm=8+Math.floor(Math.random()*7);
+    else if(r<0.65)lm=32+Math.floor(Math.random()*8);else if(r<0.80)lm=58+Math.floor(Math.random()*10);
+    else lm=jm+1+Math.floor(Math.random()*5);
+    lm=Math.min(lm,total);
+    const key=p.email?'email:'+p.email:'name:'+p.name.toLowerCase();
+    if(!attendeeMap.has(key))attendeeMap.set(key,{name:p.name,sessions:[]});
+    attendeeMap.get(key).sessions.push({join:toDate(jm),leave:toDate(lm)});
+    if(Math.random()<0.3&&lm<total-10){
+      const jm2=lm+1+Math.floor(Math.random()*5),lm2=Math.min(jm2+5+Math.floor(Math.random()*20),total);
+      attendeeMap.get(key).sessions.push({join:toDate(jm2),leave:toDate(lm2)});
+    }
+  }
+  const GRACE=60000;let rejoinCount=0;const attendees=[];
+  for(const att of attendeeMap.values()){
+    att.sessions.sort((a,b)=>a.join-b.join);
+    if(att.sessions.length>1)rejoinCount+=att.sessions.length-1;
+    const merged=[];
+    for(const s of att.sessions){
+      if(!merged.length){merged.push({join:s.join,leave:s.leave});}
+      else{const last=merged[merged.length-1];
+        if(s.join.getTime()-last.leave.getTime()<=GRACE)last.leave=s.leave>last.leave?s.leave:last.leave;
+        else merged.push({join:s.join,leave:s.leave});}
+    }
+    const totalDuration=merged.reduce((sum,s)=>sum+Math.max(0,Math.round((s.leave-s.join)/60000)),0);
+    const firstJoinMin=Math.round((att.sessions[0].join-globalMin)/60000);
+    const lastLeaveMin=Math.round((att.sessions[att.sessions.length-1].leave-globalMin)/60000);
+    attendees.push({name:att.name,joinMin:firstJoinMin,leaveMin:lastLeaveMin,duration:totalDuration,sessionCount:att.sessions.length,
+      mergedIntervals:merged.map(s=>({joinMin:Math.round((s.join-globalMin)/60000),leaveMin:Math.round((s.leave-globalMin)/60000)}))});
+  }
+  const total2=Math.max(...attendees.map(a=>a.leaveMin));
+  S.meta={name:'Sample — Crypto Masterclass',date:new Date().toLocaleDateString('en-GB'),type:'Masterclass',duration:'4 hours',focus:''};
+  runDashboard({attendees,total:total2,rawRowCount:attendees.length+rejoinCount,excludedCount:0,rejoinCount,ambiguousCount:0,dedupeMethod:'Email (where available) → normalised name',totalEmailDeduped:Math.round(attendees.length*0.65),totalNameDeduped:Math.round(attendees.length*0.35)},null);
+}
+
+function calcPercentile(sorted,p){
+  const idx=(p/100)*(sorted.length-1),lo=Math.floor(idx),hi=Math.ceil(idx);
+  if(lo===hi)return sorted[lo];
+  return Math.round(sorted[lo]+(idx-lo)*(sorted[hi]-sorted[lo]));
+}
+
+// ─── MAIN DASHBOARD ───────────────────────────────────────────────────────────
+function runDashboard(result,registrants){
+  Object.values(charts).forEach(c=>{if(c)c.destroy();});charts={};
+  const{attendees,total,rawRowCount,excludedCount,rejoinCount,ambiguousCount,dedupeMethod,totalEmailDeduped,totalNameDeduped}=result;
+  S.attendees=attendees;S.total=total;S.rawRowCount=rawRowCount;S.excludedCount=excludedCount;
+  S.rejoinCount=rejoinCount;S.ambiguousCount=ambiguousCount;S.dedupeMethod=dedupeMethod;
+  S.totalEmailDeduped=totalEmailDeduped;S.totalNameDeduped=totalNameDeduped;
+  S.registrants=registrants;S.registrantsFromSource=registrants!==null;S.chatCount=0;
+  if(!S.transcriptBlocks)S.transcriptBlocks=[];
+  document.getElementById('intakeSection').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('aiFloatBtn').style.display='flex';
+  document.getElementById('chatMessages').innerHTML='';
+  document.getElementById('summaryPrompt').style.display='none';
+  const m=S.meta;
+  document.getElementById('dbTitle').textContent=m.name||'Webinar Report';
+  document.getElementById('dbMeta').textContent=(m.date||'')+' · '+total+' min session'+(m.type?' · '+m.type:'')+(m.duration?' · '+m.duration:'');
+  document.getElementById('dbType').textContent='Webinar Autopsy Pro';
+  const warnings=[];
+  if(ambiguousCount>0)warnings.push(`⚠️ <strong>${ambiguousCount} name(s)</strong> had 5+ session records with no email — merged by name but could represent multiple people.`);
+  if(totalNameDeduped>totalEmailDeduped)warnings.push(`⚠️ More than half of attendees had no email. Name-based deduplication was used — accuracy depends on consistent name spelling.`);
+  if(excludedCount>0)warnings.push(`ℹ️ <strong>${excludedCount} internal/admin session records</strong> were excluded.`);
+  document.getElementById('warningBanners').innerHTML=warnings.map(w=>`<div class="warning-banner">${w}</div>`).join('');
+  document.getElementById('validationGrid').innerHTML=`
+    <div class="vitem"><div class="vitem-label">Raw session rows</div><div class="vitem-value">${rawRowCount}</div><div class="vitem-sub">total join/leave records</div></div>
+    <div class="vitem"><div class="vitem-label">Unique attendees</div><div class="vitem-value">${attendees.length}</div><div class="vitem-sub">real people (deduped)</div></div>
+    <div class="vitem"><div class="vitem-label">Rejoin sessions</div><div class="vitem-value">${rejoinCount}</div><div class="vitem-sub">merged into records</div></div>
+    <div class="vitem"><div class="vitem-label">Excluded accounts</div><div class="vitem-value">${excludedCount}</div><div class="vitem-sub">internal/admin removed</div></div>
+    <div class="vitem"><div class="vitem-label">Ambiguous matches</div><div class="vitem-value">${ambiguousCount}</div><div class="vitem-sub">${ambiguousCount>0?'review recommended':'none flagged'}</div></div>
+    <div class="vitem"><div class="vitem-label">Dedupe method</div><div class="vitem-value" style="font-size:12px;font-weight:500;font-family:'Montserrat',sans-serif">${dedupeMethod}</div><div class="vitem-sub">used to identify unique people</div></div>`;
+  const n=attendees.length;
+  const regDisplay=S.registrantsFromSource?S.registrants:null;
+  const showUp=regDisplay?Math.round((n/regDisplay)*100):null;
+  const sortedDurations=[...attendees.map(a=>a.duration)].sort((a,b)=>a-b);
+  const avgDur=Math.round(sortedDurations.reduce((s,d)=>s+d,0)/n);
+  const avgPct=Math.round((avgDur/total)*100);
+  const compT=total>120?0.6:0.8,compLabel=total>120?'60%':'80%';
+  S.compLabel=compLabel;
+  const completed=attendees.filter(a=>a.duration>=total*compT).length;
+  S.completed=completed;
+  const compRate=Math.round((completed/n)*100);
+  const ac=avgPct>=60?'good':avgPct>=40?'warn':'bad';
+  const cc=compRate>=40?'good':compRate>=25?'warn':'bad';
+  const bc=c=>c==='good'?'bg':c==='warn'?'bw':'bb';
+  const registrantCard=regDisplay
+    ?`<div class="mc neutral"><div class="ml">Registrants</div><div class="mv">${regDisplay}</div><div class="ms">signed up</div></div>`
+    :`<div class="mc neutral"><div class="ml">Registrants</div><div class="mv" style="font-size:13px;padding-top:6px">Unavailable</div><div class="ms">from this source</div></div>`;
+  const showUpCard=regDisplay
+    ?`<div class="mc ${showUp>=45?'good':showUp>=35?'warn':'bad'}"><div class="ml">Showed up</div><div class="mv">${n}</div><div class="ms">${showUp}% show-up rate</div><span class="mb ${bc(showUp>=45?'good':showUp>=35?'warn':'bad')}">${showUp>=45?'Above':'Below'} avg (40–55%)</span></div>`
+    :`<div class="mc neutral"><div class="ml">Unique attendees</div><div class="mv">${n}</div><div class="ms">deduped from ${rawRowCount} rows</div></div>`;
+  document.getElementById('metricCards').innerHTML=`${registrantCard}${showUpCard}
+    <div class="mc ${ac}"><div class="ml">Avg time in session</div><div class="mv">${avgDur}<span style="font-size:15px;font-weight:400"> min</span></div><div class="ms">${avgPct}% of ${total} min</div><span class="mb ${bc(ac)}">${avgPct>=60?'Strong':avgPct>=40?'Moderate':'Low'} engagement</span></div>
+    <div class="mc ${cc}"><div class="ml">Completion rate</div><div class="mv">${compRate}<span style="font-size:15px;font-weight:400">%</span></div><div class="ms">stayed ${compLabel}+ of session</div><span class="mb ${bc(cc)}">${compRate>=40?'Strong retention':compRate>=25?'Average retention':'High drop-off'}</span></div>`;
+  const median=calcPercentile(sortedDurations,50),p25=calcPercentile(sortedDurations,25),p75=calcPercentile(sortedDurations,75);
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-mini"><div class="stat-mini-label">Average</div><div class="stat-mini-value">${avgDur}<span class="stat-mini-unit"> min</span></div></div>
+    <div class="stat-mini"><div class="stat-mini-label">Median</div><div class="stat-mini-value">${median}<span class="stat-mini-unit"> min</span></div></div>
+    <div class="stat-mini"><div class="stat-mini-label">25th Percentile</div><div class="stat-mini-value">${p25}<span class="stat-mini-unit"> min</span></div></div>
+    <div class="stat-mini"><div class="stat-mini-label">75th Percentile</div><div class="stat-mini-value">${p75}<span class="stat-mini-unit"> min</span></div></div>`;
+  const step=total>120?5:2,intervals=[];
+  for(let t=0;t<=total;t+=step){
+    const present=attendees.filter(a=>a.mergedIntervals.some(iv=>iv.joinMin<=t&&iv.leaveMin>=t)).length;
+    intervals.push({t,present});
+  }
+  const dropoffs=intervals.map((d,i)=>i===0?0:Math.max(0,intervals[i-1].present-d.present));
+  S.intervals=intervals;S.dropoffs=dropoffs;
+  charts.dropoff=buildDropoff('dropoffChart',intervals,dropoffs,280);
+  const jb=[{l:'On time (0-5m)',mn:0,mx:5},{l:'6-15 min late',mn:6,mx:15},{l:'16-30 min late',mn:16,mx:30},{l:'31-60 min late',mn:31,mx:60},{l:'60+ min late',mn:61,mx:9999}];
+  const jd=jb.map(b=>attendees.filter(a=>a.joinMin>=b.mn&&a.joinMin<=b.mx).length);
+  S.joinBuckets=jb;S.joinData=jd;
+  charts.join=new Chart(document.getElementById('joinChart'),{type:'bar',data:{labels:jb.map(b=>b.l),datasets:[{data:jd,backgroundColor:'#1A1A1A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},onClick:(e,els)=>{if(els.length){e.stopPropagation();showJoinPanel(els[0].index,jb,jd,n);}},scales:{x:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{size:10},color:'#949494'},grid:{display:false}}}}});
+  const q=total/4;
+  const db=[{l:`0-${Math.round(q*0.5)}m`,mn:0,mx:Math.round(q*0.5)},{l:`${Math.round(q*0.5)+1}-${Math.round(q)}m`,mn:Math.round(q*0.5)+1,mx:Math.round(q)},{l:`${Math.round(q)+1}-${Math.round(q*2)}m`,mn:Math.round(q)+1,mx:Math.round(q*2)},{l:`${Math.round(q*2)+1}-${Math.round(q*3)}m`,mn:Math.round(q*2)+1,mx:Math.round(q*3)},{l:`${Math.round(q*3)+1}+m`,mn:Math.round(q*3)+1,mx:9999}];
+  const dd=db.map(b=>attendees.filter(a=>a.duration>=b.mn&&a.duration<=b.mx).length);
+  S.durBuckets=db;S.durData=dd;
+  charts.dur=new Chart(document.getElementById('durChart'),{type:'bar',data:{labels:db.map(b=>b.l),datasets:[{data:dd,backgroundColor:['#FE0032','#FF9933','#FF9933','#239646','#239646'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},onClick:(e,els)=>{if(els.length){e.stopPropagation();showDurPanel(els[0].index,db,dd,n,total);}},scales:{x:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{size:10},color:'#949494'},grid:{display:false}}}}});
+  const half=attendees.filter(a=>a.duration>=total*0.5).length;S.half=half;
+  const funnelLabels=regDisplay?['Registered','Attended','Stayed 50%+',`Stayed ${compLabel}+`]:['Attended','Stayed 50%+',`Stayed ${compLabel}+`];
+  const funnelVals=regDisplay?[regDisplay,n,half,completed]:[n,half,completed];
+  S.funnelData=funnelVals;
+  charts.funnel=new Chart(document.getElementById('funnelChart'),{type:'bar',data:{labels:funnelLabels,datasets:[{data:funnelVals,backgroundColor:regDisplay?['#1A1A1A','#8A8E91','#FF9933','#239646']:['#1A1A1A','#FF9933','#239646'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},onClick:(e,els)=>{if(els.length){e.stopPropagation();showFunnelPanel(els[0].index,funnelVals,funnelLabels);}},scales:{x:{ticks:{font:{size:9},color:'#949494'},grid:{display:false}},y:{ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  buildInsights(attendees,n,total,completed,compLabel,compRate,showUp,regDisplay,half,intervals,dropoffs);
+}
+
+function buildDropoff(canvasId,intervals,dropoffs,height){
+  const canvas=document.getElementById(canvasId);
+  const chart=new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels:intervals.map(d=>d.t+'m'),
+      datasets:[
+        {type:'line',data:intervals.map(d=>d.present),borderColor:'#1A1A1A',backgroundColor:'rgba(26,26,26,0.07)',tension:0.4,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:'#1A1A1A',fill:true,yAxisID:'y',order:1},
+        {type:'bar',data:dropoffs,backgroundColor:'rgba(254,0,50,0.55)',hoverBackgroundColor:'rgba(254,0,50,0.85)',yAxisID:'y2',order:2,barPercentage:0.9,categoryPercentage:0.9}
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          mode:'index',
+          intersect:false,
+          callbacks:{
+            title:t=>'Minute '+t[0].label.replace('m',''),
+            label:ctx=>{
+              if(ctx.datasetIndex===0)return 'Attendees present: '+ctx.raw;
+              if(ctx.raw>0)return 'Left this interval: '+ctx.raw+' ('+Math.round((ctx.raw/S.attendees.length)*100)+'%)';
+              return null;
+            },
+            filter:item=>item.datasetIndex===1?item.raw>0:true
+          }
+        }
+      },
+      scales:{
+        x:{ticks:{font:{size:10},color:'#949494',autoSkip:true,maxTicksLimit:14},grid:{display:false}},
+        y:{position:'left',ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},
+        y2:{position:'right',ticks:{font:{size:10},color:'#FE0032'},grid:{display:false}}
+      }
+    }
+  });
+  // Attach click AFTER chart exists — avoids closure timing bug
+  canvas.addEventListener('click',function(e){
+    const pts=chart.getElementsAtEventForMode(e,'index',{intersect:false},true);
+    if(pts.length>0){
+      e.stopPropagation();
+      showDropoffPanel(pts[0].index);
+    }
+  });
+  return chart;
+}
+
+function buildInsights(attendees,n,total,completed,compLabel,compRate,showUp,registrants,half,intervals,dropoffs){
+  // Drop-off analysis — exclude final 5% of session to avoid flagging normal end-of-webinar departure
+  const cutoff=Math.round(total*0.95);
+  // Find top 3 meaningful drops (outside final 5%)
+  const meaningfulDrops=[];
+  for(let i=1;i<intervals.length;i++){
+    if(intervals[i].t>cutoff)continue;
+    const d=intervals[i-1].present-intervals[i].present;
+    if(d>0)meaningfulDrops.push({t:intervals[i].t,drop:d,pct:Math.round((d/n)*100)});
+  }
+  meaningfulDrops.sort((a,b)=>b.drop-a.drop);
+  const top3=meaningfulDrops.slice(0,10);
+  const earlyPct=Math.round((attendees.filter(a=>a.duration<Math.round(total*0.15)).length/n)*100);
+  const latePct=Math.round((attendees.filter(a=>a.joinMin>10).length/n)*100);
+  const halfPct=Math.round((half/n)*100);
+  let dropInsight;
+  if(top3.length===0){
+    dropInsight={t:'positive',i:'📈',title:'Steady retention',text:'No significant drop points detected within the session. Content holds attention consistently. Focus on tightening the close.'};
+  } else {
+    const lines=top3.map((d,i)=>`${i+1}. Min ${d.t} — ${d.drop} left (${d.pct}% of room)`).join('<br>');
+    const worst=top3[0];
+    dropInsight={t:worst.pct>15?'negative':'warning',i:'⚠️',title:`Top ${top3.length} drop-off point${top3.length>1?'s':''}`,
+      text:`${lines}<br><br>Min ${worst.t} is your biggest problem. Scrub your recording to this point — identify what changed.`};
+  }
+  S.top3Drops=top3;
+  const ins=[
+    showUp!==null
+      ?(showUp<40?{t:'negative',i:'📉',title:'Low show-up rate',text:`Only ${showUp}% attended. Fix your reminder sequence — 24hrs, 1hr, and 10 minutes before. Check confirmation email deliverability.`}
+        :{t:'positive',i:'✅',title:'Strong show-up rate',text:`${showUp}% show-up rate is ${showUp>=50?'above':'at'} industry average. Your pre-webinar sequence is working.`})
+      :{t:'neutral',i:'📋',title:'Show-up rate unavailable',text:'No registrant source was provided. Upload a registrant export to see your show-up rate. The participants CSV only tells you who attended, not who signed up.'},
+    dropInsight,
+    earlyPct>20?{t:'negative',i:'🚪',title:'High early exit',text:`${earlyPct}% left in the first ${Math.round(total*0.15)} minutes. Your opening hook is not landing. Lead with the transformation, not the agenda.`}
+      :{t:'positive',i:'🎯',title:'Opening is working',text:`Only ${earlyPct}% dropped in the opening. Your hook is strong — people are staying for the story.`},
+    compRate<25?{t:'negative',i:'📊',title:'Close section is leaking',text:`Only ${compRate}% stayed for ${compLabel}+. People are leaving before your close. Move your offer earlier or cut content that isn't building belief.`}
+      :compRate<45?{t:'warning',i:'📊',title:'Moderate completion',text:`${compRate}% stayed to ${compLabel}+. Test a pattern interrupt at ${Math.round(total*0.6)} min to re-engage before your close.`}
+      :{t:'positive',i:'📊',title:'Strong completion',text:`${compRate}% stayed to ${compLabel}+. This audience is primed. Review your close line by line — that's where your revenue is.`},
+    latePct>30?{t:'warning',i:'⏰',title:`${latePct}% joined late`,text:'Over a third missed your opening. Check reminder timing and links. Review whether your start time works across timezones.'}
+      :{t:'positive',i:'⏰',title:'Good punctuality',text:`${100-latePct}% joined within 10 minutes. Your audience is showing up ready.`},
+    halfPct>=55?{t:'positive',i:'💡',title:'Strong mid-session hold',text:`${halfPct}% passed the halfway mark. Your structure is solid. The drop-off curve after this point tells you exactly where to fix your close.`}
+      :{t:'warning',i:'💡',title:'Mid-session drop-off',text:`Only ${halfPct}% passed halfway. Add a re-engagement moment at ${Math.round(total*0.4)} min — a proof point, client result, or story shift.`}
+  ];
+  S.insights=ins;
+  document.getElementById('insightsGrid').innerHTML=ins.map((x,i)=>`
+    <div class="insight-card ${x.t}" onclick="showInsightPanel(${i})">
+      <div class="ii">${x.i}</div><div class="it">${x.title}</div><div class="ix">${x.text}</div>
+    </div>`).join('');
+}
+
+// ─── PANELS ───────────────────────────────────────────────────────────────────
+function openPanel(title,html){document.getElementById('panelTitle').textContent=title;document.getElementById('panelBody').innerHTML=html;document.getElementById('sidePanel').classList.add('open');}
+function closePanel(){document.getElementById('sidePanel').classList.remove('open');}
+function openAIChat(){openPanel('Ask the Autopsy AI',`<div class="ps"><div class="pst">AI Assistant</div><p class="ptx" style="color:var(--muted);font-size:12px">Ask anything about your webinar results.</p></div>`);document.getElementById('chatInput').focus();}
+
+
+function summariseTranscriptGroups(groups){
+  const allLines=[];
+  for(const g of groups){for(const line of g.lines){const c=line.trim();if(c.length>10)allLines.push(c);}}
+  if(!allLines.length)return[];
+  const seen=new Set(),unique=[];
+  for(const l of allLines){const k=l.substring(0,40).toLowerCase().replace(/[^a-z0-9]/g,'');if(!seen.has(k)){seen.add(k);unique.push(l);}}
+  return unique.sort((a,b)=>b.length-a.length).slice(0,10);
+}
+function toggleExpand(uid){
+  const el=document.getElementById(uid),btn=document.getElementById(uid+'-btn');
+  if(!el||!btn)return;
+  const open=el.style.display!=='none';
+  el.style.display=open?'none':'block';
+  btn.textContent=open?'▸ Expand full transcript':'▴ Collapse transcript';
+}
+function copyText(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.textContent).then(()=>showCopyToast()).catch(()=>{});}
+function copyRaw(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.value).then(()=>showCopyToast()).catch(()=>{});}
+function showCopyToast(){
+  let t=document.getElementById('copyToast');
+  if(!t){t=document.createElement('div');t.id='copyToast';t.style.cssText='position:fixed;bottom:80px;right:32px;background:var(--dark);color:white;padding:8px 16px;border-radius:6px;font-size:12px;font-family:"Montserrat",sans-serif;z-index:9999;opacity:0;transition:opacity 0.2s';t.textContent='✓ Copied';document.body.appendChild(t);}
+  t.style.opacity='1';setTimeout(()=>{t.style.opacity='0';},1500);
+}
+
+function showDropoffPanel(i){
+  const interval=S.intervals[i];
+  if(!interval)return;
+  const t=interval.t;
+  const present=interval.present;
+  const dropped=S.dropoffs[i]||0;
+  const n=S.attendees.length;
+  const pct=Math.round((dropped/n)*100);
+  const remaining=Math.round((present/n)*100);
+  // Use exact chart step — 2min for sessions ≤120min, 5min for longer
+  const step=S.total>120?5:2;
+  const blockStart=Math.max(0,t-step);
+  const blockEnd=t;
+  const statsId='sid-'+i;
+  const statsText=`Minute ${t} — Left: ${dropped} (${pct}%) | Still present: ${present} (${remaining}%)`;
+  const statsHTML=`
+    <div class="ps">
+      <div class="pst" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Stats — minute ${t}</span>
+        <button onclick="navigator.clipboard.writeText('${statsText}').then(()=>showCopyToast())" style="font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 8px;border-radius:4px;cursor:pointer;font-family:'Montserrat',sans-serif">Copy</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div style="background:var(--light);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Left at this point</div>
+          <div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:600;color:${pct>15?'var(--red)':pct>8?'var(--accent)':'var(--dark)'}">${dropped}</div>
+          <div style="font-size:11px;color:var(--muted)">${pct}% of room</div>
+        </div>
+        <div style="background:var(--light);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Still in room</div>
+          <div style="font-family:'Oswald',sans-serif;font-size:26px;font-weight:600;color:var(--dark)">${present}</div>
+          <div style="font-size:11px;color:var(--muted)">${remaining}% of room</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--mid);margin-top:10px;line-height:1.6">${pct>15?'Significant drop. Something here lost the room.':pct>8?'Moderate drop. Worth reviewing what was on screen.':'Small drop — within normal range.'}</p>
+    </div>
+    <div style="border-top:1px solid var(--border);margin:0 0 16px 0"></div>`;
+  let transcriptHTML='';
+  if(S.transcriptBlocks&&S.transcriptBlocks.length>0){
+    const groups=getTranscriptForWindow(blockStart,blockEnd);
+    if(groups&&groups.length>0){
+      const bullets=summariseTranscriptGroups(groups);
+      const uid='tx-'+i+'-'+Date.now();
+      let fullText='';
+      for(const g of groups){fullText+=g.speaker+':\n';for(const l of g.lines)if(l.trim().length>5)fullText+='• '+l.trim()+'\n';fullText+='\n';}
+      const summaryText=bullets.map(b=>'• '+b).join('\n');
+      transcriptHTML=`<div class="ps">
+        <div class="pst" style="display:flex;justify-content:space-between;align-items:center">
+          <span>What was covered (min ${blockStart}–${blockEnd})</span>
+          <button id="${uid}-scopy" onclick="navigator.clipboard.writeText(document.getElementById('${uid}-sraw').value).then(()=>showCopyToast())" style="font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 8px;border-radius:4px;cursor:pointer;font-family:'Montserrat',sans-serif">Copy</button>
+        </div>
+        <textarea id="${uid}-sraw" style="display:none">${summaryText}</textarea>
+        <ul style="padding-left:16px;margin:8px 0 12px 0;list-style:disc">`;
+      for(const b of bullets)transcriptHTML+=`<li style="font-size:12px;color:var(--dark);line-height:1.7;margin-bottom:4px">${b}</li>`;
+      transcriptHTML+=`</ul>
+        <button onclick="toggleExpand('${uid}')" id="${uid}-btn" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:1px;text-transform:uppercase;padding:0">▸ Expand full transcript</button>
+      </div>
+      <div id="${uid}" style="display:none">
+        <div style="border-top:1px solid var(--border);margin:4px 0 14px 0"></div>
+        <div class="ps">
+          <div class="pst" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Full transcript</span>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('${uid}-fraw').value).then(()=>showCopyToast())" style="font-size:10px;color:var(--muted);background:none;border:1px solid var(--border);padding:2px 8px;border-radius:4px;cursor:pointer;font-family:'Montserrat',sans-serif">Copy</button>
+          </div>
+          <textarea id="${uid}-fraw" style="display:none">${fullText}</textarea>`;
+      for(const g of groups){
+        transcriptHTML+=`<div style="margin-bottom:14px;margin-top:8px"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px;font-family:'Oswald',sans-serif">${g.speaker}</div><ul style="padding-left:16px;margin:0;list-style:disc">`;
+        for(const line of g.lines){const c=line.trim();if(c.length>5)transcriptHTML+=`<li style="font-size:12px;color:var(--dark);line-height:1.7;margin-bottom:4px">${c}</li>`;}
+        transcriptHTML+=`</ul></div>`;
+      }
+      transcriptHTML+=`</div></div>`;
+    } else {
+      transcriptHTML=`<div class="ps"><div class="pst">Transcript</div><p style="font-size:12px;color:var(--muted)">No transcript content found for min ${blockStart}–${blockEnd}.</p></div>`;
+    }
+  } else {
+    transcriptHTML=`<div class="ps"><div class="pst">Transcript</div><p style="font-size:12px;color:var(--muted)">No transcript uploaded. Upload a .vtt file in Step 3 to see what was being said at each point.</p></div>`;
+  }
+  openPanel('Minute '+t,statsHTML+transcriptHTML);
+  document.getElementById('chatInput').value=`Why did people drop off at the ${t} minute mark and what should I do?`;
+}
+function showJoinPanel(i,buckets,data,n){
+  const b=buckets[i],count=data[i],pct=Math.round((count/n)*100);
+  openPanel('Join time: '+b.l,`
+    <div class="ps"><div class="pst">The number</div><p class="ptx"><strong>${count} unique attendees</strong> (${pct}%) joined in the <strong>${b.l}</strong> window.</p></div>
+    <div class="ps"><div class="pst">What this means</div><p class="ptx">${i===0?'Good. These people were ready and committed.':i<=2?'Late joiners missed your opening hook. They entered mid-story — conversion is harder for this group.':'Very late joiners. Likely missed belief-building entirely. Different follow-up sequence needed.'}</p></div>`);
+}
+function showDurPanel(i,buckets,data,n,total){
+  const b=buckets[i],count=data[i],pct=Math.round((count/n)*100);
+  openPanel('Time in session: '+b.l,`
+    <div class="ps"><div class="pst">The number</div><p class="ptx"><strong>${count} unique attendees</strong> (${pct}%) had a total attendance of <strong>${b.l}</strong>.</p></div>
+    <div class="ps"><div class="pst">Conversion implication</div><p class="ptx">${i<=1?'Left early — before the belief shift. Follow-up sequence must do the heavy lifting.':i===2?'Got the story but may have missed the close. Replay the close in follow-up email.':'Stayed to the close. Highest-intent group. Call these first.'}</p></div>`);
+}
+function showFunnelPanel(i,data,labels){
+  const val=data[i],pct=Math.round((val/data[0])*100);
+  const comm=['Grow registrants by improving your promotion and registration page.','The gap here is your reminder sequence problem. Fix that first.','These people are engaged — make sure your close is strong.','This is your conversion window. If sales are low, the problem is the close itself.'];
+  openPanel(labels[i],`
+    <div class="ps"><div class="pst">The number</div><p class="ptx"><strong>${val} unique people</strong> — ${pct}% reached this stage.</p></div>
+    <div class="ps"><div class="pst">What to do</div><p class="ptx">${comm[Math.min(i,comm.length-1)]}</p></div>`);
+}
+function showInsightPanel(i){
+  const ins=S.insights[i];
+  openPanel(ins.title,`<div class="ps"><div class="pst">Finding</div><p class="ptx">${ins.text}</p></div><div class="ps"><div class="pst">Go deeper</div><p class="ptx" style="color:var(--muted);font-size:11px">Use the chat below to ask the AI about this finding.</p></div>`);
+  document.getElementById('chatInput').value='Tell me more about: '+ins.title;
+}
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
+const lbTitles={dropoff:'Attendee Retention Over Time',join:'When People Joined',funnel:'Registration to Completion Funnel',dur:'Time in Session'};
+function openLightbox(key){
+  document.getElementById('lbTitle').textContent=lbTitles[key]||key;
+  document.getElementById('lightbox').classList.add('open');
+  if(lbChart){lbChart.destroy();lbChart=null;}
+  setTimeout(()=>{lbChart=buildLightboxChart(key);},50);
+}
+function buildLightboxChart(key){
+  const canvas=document.getElementById('lbChart');
+  if(key==='dropoff'){
+    return new Chart(canvas,{type:'bar',data:{labels:S.intervals.map(d=>d.t+'m'),datasets:[
+      {type:'line',data:S.intervals.map(d=>d.present),borderColor:'#1A1A1A',backgroundColor:'rgba(26,26,26,0.07)',tension:0.4,pointRadius:0,fill:true,yAxisID:'y',order:1},
+      {type:'bar',data:S.dropoffs,backgroundColor:'rgba(254,0,50,0.55)',yAxisID:'y2',order:2}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{title:t=>'Minute '+t[0].label.replace('m',''),label:ctx=>ctx.datasetIndex===0?'Attendees present: '+ctx.raw:ctx.raw>0?'Left: '+ctx.raw:null,filter:item=>item.datasetIndex===1?item.raw>0:true}}},scales:{x:{ticks:{font:{size:10},color:'#949494',autoSkip:true,maxTicksLimit:16},grid:{display:false}},y:{position:'left',ticks:{font:{size:10},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},y2:{position:'right',ticks:{font:{size:10},color:'#FE0032'},grid:{display:false}}}}});
+  }
+  if(key==='join'){
+    return new Chart(canvas,{type:'bar',data:{labels:S.joinBuckets.map(b=>b.l),datasets:[{data:S.joinData,backgroundColor:'#1A1A1A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{size:11},color:'#949494'},grid:{display:false}}}}});
+  }
+  if(key==='funnel'){
+    const funnelLabels=S.registrants?['Registered','Attended','Stayed 50%+',`Stayed ${S.compLabel}+`]:['Attended','Stayed 50%+',`Stayed ${S.compLabel}+`];
+    return new Chart(canvas,{type:'bar',data:{labels:funnelLabels,datasets:[{data:S.funnelData,backgroundColor:S.registrants?['#1A1A1A','#8A8E91','#FF9933','#239646']:['#1A1A1A','#FF9933','#239646'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},color:'#949494'},grid:{display:false}},y:{ticks:{font:{size:11},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  }
+  if(key==='dur'){
+    return new Chart(canvas,{type:'bar',data:{labels:S.durBuckets.map(b=>b.l),datasets:[{data:S.durData,backgroundColor:['#FE0032','#FF9933','#FF9933','#239646','#239646'],borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:11},color:'#949494'},grid:{color:'rgba(0,0,0,0.05)'}},y:{ticks:{font:{size:11},color:'#949494'},grid:{display:false}}}}});
+  }
+  return null;
+}
+function closeLightbox(e){
+  if(e&&e.target!==document.getElementById('lightbox')&&e.target!==document.getElementById('lbClose'))return;
+  document.getElementById('lightbox').classList.remove('open');
+  if(lbChart){lbChart.destroy();lbChart=null;}
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ─── CLAUDE CHAT ──────────────────────────────────────────────────────────────
+async function sendChat(){
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';S.chatCount++;
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="cm user">${msg}</div>`;
+  msgs.innerHTML+=`<div class="cm loading" id="loadMsg">Analysing...</div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  const n=S.attendees.length,total=S.total;
+  const sortedDurations=[...S.attendees.map(a=>a.duration)].sort((a,b)=>a-b);
+  const avgDur=Math.round(sortedDurations.reduce((s,d)=>s+d,0)/n);
+  const median=calcPercentile(sortedDurations,50);
+  const showUp=S.registrants?Math.round((n/S.registrants)*100):null;
+  const compT=total>120?0.6:0.8;
+  const compRate=Math.round((S.attendees.filter(a=>a.duration>=total*compT).length/n)*100);
+  const cutoff=Math.round(total*0.95);
+  let maxDrop=0,maxT=0;
+  S.intervals.forEach((d,i)=>{if(i>0&&d.t<=cutoff){const dr=S.intervals[i-1].present-d.present;if(dr>maxDrop){maxDrop=dr;maxT=d.t;}}});
+  const dataCtx=`WEBINAR DATA:\nName: ${S.meta.name||'Unknown'} | Type: ${S.meta.type||'Unknown'} | Duration: ${total} min\nRaw session rows: ${S.rawRowCount} | Unique attendees: ${n} | Rejoins merged: ${S.rejoinCount}\nRegistrants: ${S.registrants||'Not available'}\n${showUp!==null?`Show-up rate: ${showUp}%`:''}\nAvg time: ${avgDur} min | Median time: ${median} min | Completion: ${compRate}%\nBiggest meaningful drop-off: ${maxT} min (${Math.round((maxDrop/n)*100)}% left)\nFocus: ${S.meta.focus||'General'}\nInsights: ${S.insights.map(x=>x.title).join(', ')}\n${transcriptText?'Transcript: YES':''}${syntaxText?' | Syntax: YES':''}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:IM_CTX+'\n\n'+dataCtx,messages:[{role:'user',content:msg}]})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'No response.';
+    document.getElementById('loadMsg').remove();
+    msgs.innerHTML+=`<div class="cm ai">${reply.replace(/\n/g,'<br>')}</div>`;
+  }catch(err){document.getElementById('loadMsg').remove();msgs.innerHTML+=`<div class="cm ai">Connection error. Try again.</div>`;}
+  msgs.scrollTop=msgs.scrollHeight;
+  if(S.chatCount>=3)document.getElementById('summaryPrompt').style.display='block';
+}
+async function requestSummary(){
+  document.getElementById('summaryPrompt').style.display='none';
+  document.getElementById('chatInput').value='Please give me a full summary of everything we have discussed and the top 3 actions I should take before my next webinar.';
+  await sendChat();
+}
+
+// ─── PDF DOWNLOAD ─────────────────────────────────────────────────────────────
+function downloadPDF(){
+  // Capture chart images BEFORE opening new window
+  const chartImgs={};
+  try{chartImgs.dropoff=document.getElementById('dropoffChart').toDataURL('image/png');}catch(e){}
+  try{chartImgs.join=document.getElementById('joinChart').toDataURL('image/png');}catch(e){}
+  try{chartImgs.funnel=document.getElementById('funnelChart').toDataURL('image/png');}catch(e){}
+  try{chartImgs.dur=document.getElementById('durChart').toDataURL('image/png');}catch(e){}
+  generatePDF(chartImgs);
+}
+function generatePDF(chartImgs){
+  const m=S.meta,n=S.attendees.length,total=S.total;
+  const sortedDurations=[...S.attendees.map(a=>a.duration)].sort((a,b)=>a-b);
+  const avgDur=Math.round(sortedDurations.reduce((s,d)=>s+d,0)/n);
+  const median=calcPercentile(sortedDurations,50),p25=calcPercentile(sortedDurations,25),p75=calcPercentile(sortedDurations,75);
+  const showUp=S.registrants?Math.round((n/S.registrants)*100):null;
+  const compT=total>120?0.6:0.8,compLabel=S.compLabel;
+  const completed=S.completed,compRate=Math.round((completed/n)*100),half=S.half;
+  let maxDrop=0,maxT=0;
+  S.intervals.forEach((d,i)=>{if(i>0&&d.t<=Math.round(total*0.95)){const dr=S.intervals[i-1].present-d.present;if(dr>maxDrop){maxDrop=dr;maxT=d.t;}}});
+  const jbRows=S.joinBuckets.map((b,i)=>{const pct=Math.round((S.joinData[i]/n)*100);return`<tr><td>${b.l}</td><td><strong>${S.joinData[i]}</strong></td><td>${pct}%</td></tr>`;}).join('');
+  const dbRows=S.durBuckets.map((b,i)=>{const pct=Math.round((S.durData[i]/n)*100);return`<tr><td>${b.l}</td><td><strong>${S.durData[i]}</strong></td><td>${pct}%</td></tr>`;}).join('');
+  const spikes=S.intervals.map((d,i)=>({t:d.t,drop:S.dropoffs[i]})).filter(d=>d.drop>0&&d.t<=Math.round(total*0.95)).sort((a,b)=>b.drop-a.drop).slice(0,5);
+  const spikeRows=spikes.map(s=>{const pct=Math.round((s.drop/n)*100);return`<tr><td>${s.t} min</td><td><strong>${s.drop}</strong></td><td>${pct}%</td></tr>`;}).join('');
+  const funnelLabels=S.registrants?['Registered','Attended','Stayed 50%+',`Stayed ${compLabel}+`]:['Attended','Stayed 50%+',`Stayed ${compLabel}+`];
+  const funnelVals=S.registrants?[S.registrants,n,half,completed]:[n,half,completed];
+  const funnelRows=funnelLabels.map((l,i)=>{const pct=i===0?100:Math.round((funnelVals[i]/funnelVals[0])*100);return`<tr><td>${l}</td><td><strong>${funnelVals[i]}</strong></td><td>${pct}%</td></tr>`;}).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Webinar Autopsy Pro — ${m.name}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:white;color:#1A1A1A;font-size:12px;line-height:1.6}
+  .cover{background:#1A1A1A;color:white;padding:60px 50px;min-height:200px;position:relative}.cover-logo{font-size:14px;letter-spacing:3px;color:#FF9933;margin-bottom:8px}
+  .cover-title{font-size:32px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}.cover-meta{font-size:12px;color:#888}
+  .cover-bar{position:absolute;bottom:0;left:0;right:0;height:4px;background:#FF9933}
+  .page{padding:40px 50px;page-break-after:always}.page:last-child{page-break-after:auto}
+  .section-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#888;margin-bottom:14px;font-weight:600;border-bottom:1px solid #EEE;padding-bottom:8px}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+  .metric{background:#F7F7F5;padding:14px;border-left:3px solid #1A1A1A}.metric.good{border-left-color:#239646}.metric.warn{border-left-color:#FF9933}.metric.bad{border-left-color:#FE0032}
+  .metric-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:5px}.metric-value{font-size:26px;font-weight:700;color:#1A1A1A;line-height:1}.metric-sub{font-size:10px;color:#999;margin-top:3px}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}.stat{background:#F7F7F5;padding:12px;text-align:center}
+  .stat-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#999;margin-bottom:3px}.stat-value{font-size:20px;font-weight:700;color:#1A1A1A}
+  .validation{background:#fff4e6;border:1px solid #FF9933;padding:14px 16px;margin-bottom:24px;border-radius:4px}
+  .validation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.vitem-label{font-size:9px;text-transform:uppercase;color:#888;letter-spacing:1px}.vitem-val{font-size:14px;font-weight:700;color:#1A1A1A}
+  table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:11px}th{background:#1A1A1A;color:white;padding:7px 10px;text-align:left;font-size:9px;letter-spacing:1px;text-transform:uppercase}
+  td{padding:7px 10px;border-bottom:1px solid #EEE;color:#3D3D3D}tr:nth-child(even) td{background:#F9F9F9}
+  .insight{background:#F9F9F9;border-left:3px solid #1A1A1A;padding:14px 16px;margin-bottom:10px}.insight.positive{border-left-color:#239646}.insight.warning{border-left-color:#FF9933}.insight.negative{border-left-color:#FE0032}
+  .insight-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;color:#1A1A1A}.insight-text{font-size:11px;color:#5F5E5A;line-height:1.6}
+  .focus-box{background:#FFF4E6;border:1px solid #FF9933;padding:12px;margin-bottom:20px;font-size:11px}
+  .footer{background:#1A1A1A;color:#888;padding:12px 50px;font-size:9px;letter-spacing:1px;text-align:center}
+  @media print{.page{page-break-after:always}}</style></head><body>
+  <div class="cover"><div class="cover-logo">WEBINAR AUTOPSY PRO</div><div class="cover-title">${m.name||'Webinar Report'}</div>
+  <div class="cover-meta">${m.date||''} &nbsp;·&nbsp; ${[m.type,m.duration].filter(Boolean).join(' · ')||'Webinar Autopsy Pro'}${transcriptText?' &nbsp;·&nbsp; Transcript: included':''}${syntaxText?' &nbsp;·&nbsp; Syntax: included':''}</div><div class="cover-bar"></div></div>
+  <div class="page">
+    <div class="section-title">Data quality validation</div>
+    <div class="validation"><strong>Dedupe method:</strong> ${S.dedupeMethod} &nbsp;·&nbsp; <strong>Grace window:</strong> 60s &nbsp;·&nbsp; <strong>Excluded:</strong> ${S.excludedCount}${S.ambiguousCount>0?` &nbsp;·&nbsp; ⚠️ ${S.ambiguousCount} ambiguous match(es)`:''}
+    <div class="validation-grid"><div><div class="vitem-label">Raw session rows</div><div class="vitem-val">${S.rawRowCount}</div></div><div><div class="vitem-label">Unique attendees</div><div class="vitem-val">${n}</div></div><div><div class="vitem-label">Rejoin sessions</div><div class="vitem-val">${S.rejoinCount}</div></div></div></div>
+    <div class="section-title">Executive summary</div>
+    <div class="metrics">
+      <div class="metric neutral"><div class="metric-label">Registrants</div><div class="metric-value">${S.registrants||'N/A'}</div><div class="metric-sub">${S.registrants?'from source':'unavailable'}</div></div>
+      <div class="metric ${showUp!==null?(showUp>=45?'good':showUp>=35?'warn':'bad'):'neutral'}"><div class="metric-label">${showUp!==null?'Show-up rate':'Unique attendees'}</div><div class="metric-value">${showUp!==null?showUp+'%':n}</div><div class="metric-sub">${showUp!==null?n+' attended':'deduped from '+S.rawRowCount+' rows'}</div></div>
+      <div class="metric neutral"><div class="metric-label">Avg time</div><div class="metric-value">${avgDur}m</div><div class="metric-sub">of ${total} min session</div></div>
+      <div class="metric ${compRate>=40?'good':compRate>=25?'warn':'bad'}"><div class="metric-label">Completion</div><div class="metric-value">${compRate}%</div><div class="metric-sub">stayed ${compLabel}+</div></div>
+    </div>
+    <div class="section-title">Attendance distribution</div>
+    <div class="stats-row"><div class="stat"><div class="stat-label">Average</div><div class="stat-value">${avgDur} min</div></div><div class="stat"><div class="stat-label">Median</div><div class="stat-value">${median} min</div></div><div class="stat"><div class="stat-label">25th Percentile</div><div class="stat-value">${p25} min</div></div><div class="stat"><div class="stat-label">75th Percentile</div><div class="stat-value">${p75} min</div></div></div>
+    ${m.focus?`<div class="focus-box"><strong>Analysis focus:</strong> ${m.focus}</div>`:''}
+  </div>
+  <div class="page">
+    <div class="section-title">Drop-off analysis — top 5 spikes (end-of-session excluded)</div>
+    ${chartImgs.dropoff?`<img src="${chartImgs.dropoff}" style="width:100%;max-height:260px;object-fit:contain;margin-bottom:16px;border-radius:4px" alt="Retention chart">`:''}
+    <table><thead><tr><th>Time</th><th>People who left</th><th>% of attendees</th></tr></thead><tbody>${spikeRows}</tbody></table>
+    <div class="section-title">When people joined</div>
+    ${chartImgs.join?`<img src="${chartImgs.join}" style="width:100%;max-height:200px;object-fit:contain;margin-bottom:16px;border-radius:4px" alt="Join time chart">`:''}
+    <table><thead><tr><th>Bucket</th><th>Attendees</th><th>%</th></tr></thead><tbody>${jbRows}</tbody></table>
+    <div class="section-title">Time in session</div>
+    ${chartImgs.dur?`<img src="${chartImgs.dur}" style="width:100%;max-height:180px;object-fit:contain;margin-bottom:16px;border-radius:4px" alt="Duration chart">`:''}
+    <table><thead><tr><th>Duration range</th><th>Attendees</th><th>%</th></tr></thead><tbody>${dbRows}</tbody></table>
+    <div class="section-title">Funnel</div>
+    ${chartImgs.funnel?`<img src="${chartImgs.funnel}" style="width:100%;max-height:200px;object-fit:contain;margin-bottom:16px;border-radius:4px" alt="Funnel chart">`:''}
+    <table><thead><tr><th>Stage</th><th>Count</th><th>%</th></tr></thead><tbody>${funnelRows}</tbody></table>
+  </div>
+  <div class="page">
+    <div class="section-title">Conversion intelligence</div>
+    ${S.insights.map(x=>`<div class="insight ${x.t}"><div class="insight-title">${x.i} ${x.title}</div><div class="insight-text">${x.text}</div></div>`).join('')}
+  </div>
+  <div class="footer">Webinar Autopsy Pro &nbsp;·&nbsp; Internal use only &nbsp;·&nbsp; ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+  <script>setTimeout(()=>window.print(),500)<\/script></body></html>`);
+  w.document.close();
+}
+
+// ─── POWERPOINT DOWNLOAD ──────────────────────────────────────────────────────
+async function downloadPPTX(){
+  const m=S.meta,n=S.attendees.length,total=S.total;
+  const sortedDurations=[...S.attendees.map(a=>a.duration)].sort((a,b)=>a-b);
+  const avgDur=Math.round(sortedDurations.reduce((s,d)=>s+d,0)/n);
+  const avgPct=Math.round((avgDur/total)*100);
+  const compT=total>120?0.6:0.8;
+  const completed=S.completed,compRate=Math.round((completed/n)*100);
+  const showUp=S.registrants?Math.round((n/S.registrants)*100):null;
+  const median=calcPercentile(sortedDurations,50),p25=calcPercentile(sortedDurations,25),p75=calcPercentile(sortedDurations,75);
+  const cutoff=Math.round(total*0.95);
+  const spikes=S.intervals.map((d,i)=>({t:d.t,drop:S.dropoffs[i]})).filter(d=>d.drop>0&&d.t<=cutoff).sort((a,b)=>b.drop-a.drop).slice(0,10);
+  // Colours matching IM brand
+  const DARK='1A1A1A',ORANGE='FF9933',WHITE='FFFFFF',MID='8A8E91',LIGHT='F7F7F5',GREEN='239646',RED='FE0032';
+  const pres=new PptxGenJS();
+  pres.layout='LAYOUT_WIDE';
+  pres.title='Webinar Autopsy — '+( m.name||'Report');
+  const W=13.3,H=7.5;
+  const footer=(slide)=>{
+    slide.addShape('rect',{x:0,y:H-0.35,w:W,h:0.35,fill:{color:DARK}});
+    slide.addText(`Investment Mastery  |  ${m.name||'Webinar Report'}  |  ${m.date||''}`,{x:0.4,y:H-0.32,w:W-0.8,h:0.28,fontSize:9,color:MID,fontFace:'Calibri',valign:'middle'});
+  };
+  // ── SLIDE 1: Cover ────────────────────────────────────────────────────────
+  const s1=pres.addSlide();
+  s1.background={color:'363A3F'};
+  s1.addShape('rect',{x:0,y:0,w:0.12,h:H,fill:{color:ORANGE}});
+  s1.addText('WEBINAR AUTOPSY PRO',{x:0.6,y:1.6,w:10,h:0.5,fontSize:13,color:ORANGE,fontFace:'Calibri',charSpacing:4,bold:false});
+  s1.addText(m.name||'Webinar Report',{x:0.6,y:2.2,w:11,h:1.4,fontSize:52,bold:true,color:WHITE,fontFace:'Calibri'});
+  s1.addText(`${m.date||''}  ·  ${m.type||'Webinar'}  ·  ${m.duration||total+' min'}`,{x:0.6,y:3.9,w:10,h:0.5,fontSize:16,color:MID,fontFace:'Calibri'});
+  s1.addShape('rect',{x:0.6,y:4.55,w:1.8,h:0.05,fill:{color:ORANGE}});
+  s1.addText('Drop-off Analysis  |  Retention Metrics  |  Conversion Intelligence',{x:0.6,y:4.75,w:10,h:0.4,fontSize:13,color:'6B7280',fontFace:'Calibri'});
+  // ── SLIDE 2: Key Metrics ──────────────────────────────────────────────────
+  const s2=pres.addSlide();
+  s2.background={color:WHITE};
+  s2.addText('Key Metrics',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s2.addText('Performance summary at a glance',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const metrics=[
+    {label:'Unique Attendees',value:String(n),sub:'real people (deduped)',color:DARK},
+    {label:'Avg Time in Session',value:avgDur+'m',sub:`${avgPct}% of ${total} min`,color:avgPct>=60?GREEN:avgPct>=40?ORANGE:RED},
+    {label:'Completion Rate',value:compRate+'%',sub:`stayed ${S.compLabel}+`,color:compRate>=40?GREEN:compRate>=25?ORANGE:RED},
+    {label:'Show-up Rate',value:showUp?showUp+'%':'N/A',sub:showUp?n+' of '+S.registrants+' registered':'No registrant data',color:showUp?(showUp>=45?GREEN:showUp>=35?ORANGE:RED):MID},
+  ];
+  metrics.forEach((met,idx)=>{
+    const cx=0.5+(idx*3.1),cy=1.55,cw=2.85,ch=1.8;
+    s2.addShape('rect',{x:cx,y:cy,w:cw,h:ch,fill:{color:LIGHT},line:{color:'E8E8E4',width:1}});
+    s2.addShape('rect',{x:cx,y:cy,w:cw,h:0.07,fill:{color:met.color}});
+    s2.addText(met.label,{x:cx+0.15,y:cy+0.18,w:cw-0.3,h:0.3,fontSize:10,color:MID,fontFace:'Calibri',charSpacing:1});
+    s2.addText(met.value,{x:cx+0.15,y:cy+0.5,w:cw-0.3,h:0.75,fontSize:44,bold:true,color:DARK,fontFace:'Calibri'});
+    s2.addText(met.sub,{x:cx+0.15,y:cy+1.28,w:cw-0.3,h:0.3,fontSize:11,color:MID,fontFace:'Calibri'});
+  });
+  // Attendance distribution row
+  const distLabels=['Average','Median','25th Percentile','75th Percentile'];
+  const distVals=[avgDur+'m',median+'m',p25+'m',p75+'m'];
+  s2.addText('Attendance Distribution',{x:0.5,y:3.55,w:12,h:0.3,fontSize:11,color:MID,fontFace:'Calibri',charSpacing:2,bold:true});
+  distLabels.forEach((lbl,idx)=>{
+    const cx=0.5+(idx*3.1),cy=3.9;
+    s2.addShape('rect',{x:cx,y:cy,w:2.85,h:0.85,fill:{color:WHITE},line:{color:'E8E8E4',width:1}});
+    s2.addText(lbl,{x:cx+0.12,y:cy+0.08,w:2.6,h:0.25,fontSize:9,color:MID,fontFace:'Calibri',charSpacing:1});
+    s2.addText(distVals[idx],{x:cx+0.12,y:cy+0.35,w:2.6,h:0.38,fontSize:26,bold:true,color:DARK,fontFace:'Calibri'});
+  });
+  footer(s2);
+  // ── SLIDE 3: Top 10 Drop-off Points ──────────────────────────────────────
+  const s3=pres.addSlide();
+  s3.background={color:WHITE};
+  s3.addText('Top Drop-off Points',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s3.addText('End-of-session excluded (final 5% of runtime)',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const tblData=[[
+    {text:'Minute',options:{bold:true,color:WHITE,fill:{color:DARK},fontSize:11,fontFace:'Calibri'}},
+    {text:'People Left',options:{bold:true,color:WHITE,fill:{color:DARK},fontSize:11,fontFace:'Calibri'}},
+    {text:'% of Room',options:{bold:true,color:WHITE,fill:{color:DARK},fontSize:11,fontFace:'Calibri'}},
+    {text:'Severity',options:{bold:true,color:WHITE,fill:{color:DARK},fontSize:11,fontFace:'Calibri'}}
+  ]];
+  spikes.forEach(sp=>{
+    const spPct=Math.round((sp.drop/n)*100);
+    const sev=spPct>15?'High':spPct>8?'Moderate':'Low';
+    const sevColor=spPct>15?RED:spPct>8?ORANGE:GREEN;
+    tblData.push([
+      {text:`${sp.t} min`,options:{fontSize:12,fontFace:'Calibri',color:DARK}},
+      {text:String(sp.drop),options:{fontSize:12,fontFace:'Calibri',color:DARK,bold:true}},
+      {text:spPct+'%',options:{fontSize:12,fontFace:'Calibri',color:DARK}},
+      {text:sev,options:{fontSize:12,fontFace:'Calibri',color:sevColor,bold:true}}
+    ]);
+  });
+  s3.addTable(tblData,{x:0.5,y:1.45,w:12.3,colW:[2.5,3,2.8,4],border:{pt:1,color:'E8E8E4'},fill:{color:WHITE},rowH:0.38});
+  footer(s3);
+  // ── SLIDE 4: When People Joined ───────────────────────────────────────────
+  const s4=pres.addSlide();
+  s4.background={color:WHITE};
+  s4.addText('When People Joined',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s4.addText('First join per unique attendee',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const jLabels=S.joinBuckets.map(b=>b.l);
+  const jVals=S.joinData;
+  s4.addChart(pres.charts.BAR,
+    [{name:'Attendees',labels:jLabels,values:jVals}],
+    {x:0.5,y:1.4,w:12.3,h:4.5,barDir:'bar',chartColors:[DARK],chartArea:{fill:{color:WHITE}},catAxisLabelColor:MID,valAxisLabelColor:MID,valGridLine:{color:'E2E8F0',size:0.5},catGridLine:{style:'none'},showValue:true,dataLabelColor:DARK,showLegend:false});
+  footer(s4);
+  // ── SLIDE 5: Time in Session ──────────────────────────────────────────────
+  const s5=pres.addSlide();
+  s5.background={color:WHITE};
+  s5.addText('Time in Session',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s5.addText('Total attendance per unique attendee',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const dLabels=S.durBuckets.map(b=>b.l);
+  const dVals=S.durData;
+  const dColors=[RED,ORANGE,ORANGE,GREEN,GREEN];
+  s5.addChart(pres.charts.BAR,
+    [{name:'Attendees',labels:dLabels,values:dVals}],
+    {x:0.5,y:1.4,w:12.3,h:4.5,barDir:'bar',chartColors:dColors,chartArea:{fill:{color:WHITE}},catAxisLabelColor:MID,valAxisLabelColor:MID,valGridLine:{color:'E2E8F0',size:0.5},catGridLine:{style:'none'},showValue:true,dataLabelColor:DARK,showLegend:false});
+  footer(s5);
+  // ── SLIDE 6: Funnel ───────────────────────────────────────────────────────
+  const s6=pres.addSlide();
+  s6.background={color:WHITE};
+  s6.addText('Registration to Completion Funnel',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s6.addText('Where you lost people from sign-up through to the close',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const fLabels=S.registrants?['Registered','Attended','Stayed 50%+',`Stayed ${S.compLabel}+`]:['Attended','Stayed 50%+',`Stayed ${S.compLabel}+`];
+  const fVals=S.funnelData;
+  const fColors=S.registrants?[DARK,MID,ORANGE,GREEN]:[DARK,ORANGE,GREEN];
+  s6.addChart(pres.charts.BAR,
+    [{name:'People',labels:fLabels,values:fVals}],
+    {x:0.5,y:1.4,w:12.3,h:4.5,barDir:'col',chartColors:fColors,chartArea:{fill:{color:WHITE}},catAxisLabelColor:MID,valAxisLabelColor:MID,valGridLine:{color:'E2E8F0',size:0.5},catGridLine:{style:'none'},showValue:true,dataLabelColor:DARK,showLegend:false});
+  footer(s6);
+  // ── SLIDE 7: Conversion Intelligence ────────────────────────────────────
+  const s7=pres.addSlide();
+  s7.background={color:WHITE};
+  s7.addText('Conversion Intelligence',{x:0.5,y:0.35,w:12,h:0.7,fontSize:36,bold:true,color:DARK,fontFace:'Calibri'});
+  s7.addText('AI-generated insights from your data',{x:0.5,y:1.0,w:12,h:0.3,fontSize:14,color:MID,fontFace:'Calibri',italic:true});
+  const cardColors={positive:GREEN,warning:ORANGE,negative:RED,neutral:MID};
+  S.insights.forEach((ins,idx)=>{
+    const row=Math.floor(idx/3),col=idx%3;
+    const cx=0.5+(col*4.2),cy=1.5+(row*2.4),cw=4.0,ch=2.1;
+    const cc=cardColors[ins.t]||MID;
+    s7.addShape('rect',{x:cx,y:cy,w:cw,h:ch,fill:{color:LIGHT},line:{color:'E8E8E4',width:1}});
+    s7.addShape('rect',{x:cx,y:cy,w:cw,h:0.06,fill:{color:cc}});
+    s7.addText(ins.title,{x:cx+0.15,y:cy+0.15,w:cw-0.3,h:0.35,fontSize:12,bold:true,color:DARK,fontFace:'Calibri'});
+    // Strip HTML from insight text
+    const cleanText=ins.text.replace(/<br>/g,' ').replace(/<[^>]+>/g,'');
+    s7.addText(cleanText,{x:cx+0.15,y:cy+0.55,w:cw-0.3,h:1.4,fontSize:10,color:MID,fontFace:'Calibri',valign:'top',wrap:true});
+  });
+  footer(s7);
+  pres.writeFile({fileName:(m.name||'Webinar_Autopsy')+'_Report.pptx'});
+}
+
+// ─── RESET ────────────────────────────────────────────────────────────────────
+function resetDashboard(){
+  Object.values(charts).forEach(c=>{if(c)c.destroy();});charts={};
+  if(lbChart){lbChart.destroy();lbChart=null;}
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('intakeSection').style.display='flex';
+  document.getElementById('aiFloatBtn').style.display='none';
+  document.getElementById('csvInput').value='';csvData=null;csvFileName='';
+  document.getElementById('csvName').textContent='';
+  document.getElementById('csvDrop').classList.remove('has-file');
+  document.getElementById('transcriptName').textContent='';
+  document.getElementById('syntaxName').textContent='';
+  document.getElementById('transcriptBox').classList.remove('has-file');
+  document.getElementById('syntaxBox').classList.remove('has-file');
+  document.getElementById('chatMessages').innerHTML='';
+  transcriptText='';syntaxText='';
+  S.transcriptBlocks=[];S.sessionStartMs=null;
+  closePanel();
+}
+</script>
+</body>
+</html>
